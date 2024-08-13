@@ -45,7 +45,12 @@ void merge(int* A, size_t p, size_t q, size_t r) {
 
 void mergeSort(int* A, size_t p, size_t r) {
 
+    // p = left
+    // r = right
+
     if(p < r) {
+
+        // q = mid
         size_t q = (p+r)/2; // suddivido l'array in due parti
         
         mergeSort(A, p, q); // applico il merge sort fino a quando i sotto-array hanno dimensione = 1
