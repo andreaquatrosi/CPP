@@ -9,6 +9,7 @@ int* init_Array(size_t N) {
 
     int* A = new int [N];
 
+    cout << "Enter array elements:\n";
     for(size_t i = 0; i < N; i++)
         cin >> A[i];
 
@@ -53,9 +54,7 @@ void dealloc_Array(int* A) {
     delete [] A;
     A = nullptr;
 
-    if(A == nullptr) {
-        cout << "\narray = nullptr\n";
-    } else {
+    if(A) {
         cerr << "\nError while deallocating the array.\n";
         return;
     }

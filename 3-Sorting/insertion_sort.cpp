@@ -9,18 +9,12 @@ void insertion_sort(int array[]) {
     for(size_t i = 1; i < N; i++) {
         int temp = array[i];
 
-        int j = i;
+        size_t j = i;
         while((j > 0) && (temp < array[j - 1])) {
-
-        array[j] = array[j - 1];
-        j--;
-
-        cout << "\n\nArray:\n";
-        for(size_t k = 0; k < N; k++) {
-            cout << array[k] << " ";
+            array[j] = array[j - 1];
+            j--;
         }
-        }
-    
+        
         array[j] = temp;
     }
 }

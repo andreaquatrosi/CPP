@@ -66,9 +66,7 @@ void dealloc_Matrix(int** mtx, size_t N) {
     delete [] mtx;
     mtx = nullptr;
 
-    if(mtx == nullptr) {
-        cout << "\nmtx = nullptr\n";
-    } else {
+    if(mtx) {
         cerr << "Error while freeing matrix.\n";
         return;
     }

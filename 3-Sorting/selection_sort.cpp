@@ -17,9 +17,9 @@ void selection_sort(int array[]) {
         size_t index_min = i;
 
         for(size_t j = i + 1; j < N; j++) {
-        if(array[j] < array[i]) {
-            index_min = j;
-        }
+            if(array[j] < array[i]) {
+                index_min = j;
+            }
         }
 
         swap(array[i], array[index_min]);

@@ -1,7 +1,3 @@
-/*
-    For some unknown reason this code do not produce any output
-*/
-
 #include <iostream>
 #include <cstdlib>
 #include <time.h>
@@ -14,31 +10,18 @@ int* init_Array() {
 
     int* array = new int [N];
 
-    for(size_t i = 0; i < N; i++) {
-    
-        bool is_unique = true;
-
-        do {
-            array[i] = rand() % 20;
-        
-            // Check for duplicates
-            for (size_t j = 0; j < i; ++j) {
-        
-                if (array[j] == array[i]) {
-                is_unique = false;
-                break;
-                }
-            }
-        } while (!is_unique);
-    }
+    cout << "Enter array elements:\n";
+    for(size_t i = 0; i < N; i++)
+        cin >> array[i];
 
     return array;
 }
 
 void print_Array(int* array) {
 
+    cout << "\nArray:\n";
     for(size_t i = 0; i < N; i++) {
-        cout << array[i] << "\t";
+        cout << array[i] << " ";
     }
 
     cout << endl;
@@ -71,24 +54,22 @@ void binary_Search(int *array, int key) {
         int midpoint = (start + end)/2;
         
         if (array[midpoint] == key) {
-        found = true;
+            found = true;
         } else if (key < array[midpoint]) {
-        end = midpoint - 1;
+            end = midpoint;
         } else {
-        start = midpoint + 1;
+            start = midpoint + 1;
         }
     }
 
     if(found) {
-        cout << key << "found.";
+        cout << key << " found.";
     } else {
-        cout << key << "not found.";
+        cout << key << " not found.";
     }
 }
 
 int main() {
-
-    srand(static_cast<unsigned>(time(NULL)));
     
     int *a = init_Array();
     cout << "Unsorted Array:\n";
@@ -99,8 +80,8 @@ int main() {
     print_Array(a);
 
     int key;
+    cout << "\nEnter key:\n";
     cin >> key;
-
     binary_Search(a, key);  
 
     delete [] a;
