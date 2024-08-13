@@ -28,11 +28,11 @@ void merge(int* A, size_t p, size_t q, size_t r) {
 
     for(size_t k = p; k <= r; k++) {
         if(L[i] < R[j]) {
-        A[k] = L[i];
-        i++;
+            A[k] = L[i];
+            i++;
         } else {
-        A[k] = R[j];
-        j++;
+            A[k] = R[j];
+            j++;
         }
     }
 
@@ -53,9 +53,10 @@ void mergeSort(int* A, size_t p, size_t r) {
         // q = mid
         size_t q = (p+r)/2; // suddivido l'array in due parti
         
-        mergeSort(A, p, q); // applico il merge sort fino a quando i sotto-array hanno dimensione = 1
-        mergeSort(A, q+1, r);
-        merge(A, p, q, r);
+        // applico il merge sort fino a quando i sotto-array hanno dimensione = 1
+        mergeSort(A, p, q);     // suddivido ricorsivamente la prima metà
+        mergeSort(A, q+1, r);   // suddivido ricorsivamente la seconda metà
+        merge(A, p, q, r);      // unisco le due metà
     }
 }
 
