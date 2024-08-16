@@ -60,7 +60,6 @@ void dealloc_Array(int* A) {
     }
 }
 
-// --
 int main() {
 
     char* fileName = new char [100];
