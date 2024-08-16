@@ -34,6 +34,20 @@ class ContoBancario {
         }
 
         // Metodi Setter
+        void set_numeroConto(int numeroConto) {
+            
+            this->numeroConto = numeroConto;
+        }
+
+        void set_intestatario(char* intestatario) {
+            
+            strcpy(this->intestatario, intestatario);
+        }
+
+        void set_saldo(double saldo) {
+            
+            this->saldo = saldo;
+        }
 
         // Funzionamento della Classe
         void Deposito(double importo) {
@@ -120,11 +134,11 @@ int main() {
         if(value) {
             cout << "Vuoi prelevare altri soldi? ";
             cin >> risposta; 
-        } else if (!value && (!(risposta == 'y' || risposta == 'Y'))) {
+        } else {
             break;
         }
 
-    } while(value);
+    } while((risposta == 'y' || risposta == 'Y'));
 
     return 0;
 }
