@@ -103,6 +103,7 @@ ContoBancario& confronta_Saldi(ContoBancario& cb1, ContoBancario& cb2) {
     }
 }
 
+// main
 int main() {
 
     cout << "Inserisci il nome dell'intestatario: ";
