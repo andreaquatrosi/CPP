@@ -20,17 +20,17 @@ class ContoBancario {
         // Metodi Getter
         int get_numeroConto() const {
 
-            return numeroConto;
+            return this->numeroConto;
         }
 
         char* get_intestatario() const {
 
-            return intestatario;
+            return this->intestatario;
         }
 
         double get_saldo() const {
 
-            return saldo;
+            return this->saldo;
         }
 
         // Metodi Setter
