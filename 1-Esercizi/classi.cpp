@@ -81,6 +81,8 @@ class ContoBancario {
         // friend :D
         friend void bonus_Saldo(ContoBancario& cb);
 
+        friend ContoBancario& confronta_Saldi(ContoBancario& cb1, ContoBancario& cb2);
+
         ~ContoBancario() {
             delete [] intestatario;
         }
@@ -90,6 +92,15 @@ class ContoBancario {
 void bonus_Saldo(ContoBancario& cb) {
 
     cb.saldo *= 2;
+}
+
+ContoBancario& confronta_Saldi(ContoBancario& cb1, ContoBancario& cb2) {
+
+    if(cb1.get_saldo() > cb2.get_saldo()) {
+        return cb1;
+    } else {
+        return cb2;
+    }
 }
 
 int main() {
@@ -155,6 +166,9 @@ int main() {
     bonus_Saldo(cb);
 
     cb.MostraDettagli();
+
+    // to use confronta_Saldi(...) add another object of the same class
+    // write here...
 
     return 0;
 }
