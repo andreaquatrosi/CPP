@@ -78,10 +78,19 @@ class ContoBancario {
                  << "\n";
         }
 
+        // friend :D
+        friend void bonus_Saldo(ContoBancario& cb);
+
         ~ContoBancario() {
             delete [] intestatario;
         }
 };
+
+// Funzione Friend :D
+void bonus_Saldo(ContoBancario& cb) {
+
+    cb.saldo *= 2;
+}
 
 int main() {
 
@@ -139,6 +148,11 @@ int main() {
         }
 
     } while((risposta == 'y' || risposta == 'Y'));
+
+    cb.MostraDettagli();
+
+    cout << "Hai diritto ad un BONUS !\n";
+    bonus_Saldo(cb);
 
     cb.MostraDettagli();
 
