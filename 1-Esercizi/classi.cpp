@@ -140,5 +140,7 @@ int main() {
 
     } while((risposta == 'y' || risposta == 'Y'));
 
+    cb.MostraDettagli();
+
     return 0;
 }
