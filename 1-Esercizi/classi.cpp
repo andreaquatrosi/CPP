@@ -13,6 +13,13 @@ class ContoBancario {
         double saldo;
     
     public:
+        // Costruttore Default
+        ContoBancario() : numeroConto(0), intestatario(nullptr), saldo(0.0) {
+            intestatario = new char[1];
+            intestatario[0] = '\0';
+        }
+
+        // Costruttore con parametri
         ContoBancario(int nc, char* i, double s): numeroConto(nc), intestatario(new char [100]), saldo(s) {
             strcpy(intestatario, i);
         } 
@@ -51,7 +58,7 @@ class ContoBancario {
 
         // Funzionamento della Classe
         void Deposito(double importo) {
-            // aggiunge un importo specificato al saldo del conto
+
             saldo += importo;
         }
 
@@ -79,7 +86,7 @@ class ContoBancario {
         }
 
         // friend :D
-        friend void bonus_Saldo(ContoBancario& cb);
+        friend void bonus_Saldo(ContoBancario* accounts, int );
 
         friend ContoBancario& confronta_Saldi(ContoBancario& cb1, ContoBancario& cb2);
 
@@ -89,9 +96,30 @@ class ContoBancario {
 };
 
 // Funzione Friend :D
-void bonus_Saldo(ContoBancario& cb) {
+void bonus_Saldo(ContoBancario* accounts, int N) {
 
-    cb.saldo *= 2;
+    int ID;
+    cout << "\nWich account shall receive a bonus? [Enter account ID]: ";
+    cin >> ID;
+
+    size_t i = 0;
+    bool value;
+    do {
+        if(ID == accounts[i].get_numeroConto()) {
+            cout << "\n" << accounts[i].get_intestatario() << " has received a bonus!\n";
+            accounts[i].set_saldo(1500);
+            value = true;
+        } else {
+            value = false;
+        }
+            
+        i++;
+    } while(!value && i < N);
+
+    if(!value) {
+        system("CLS");
+        cout << "\nThe given ID doesn't match an existing account.\n";
+    }
 }
 
 ContoBancario& confronta_Saldi(ContoBancario& cb1, ContoBancario& cb2) {
@@ -103,73 +131,75 @@ ContoBancario& confronta_Saldi(ContoBancario& cb1, ContoBancario& cb2) {
     }
 }
 
+// Functions
+ContoBancario& findMaxSaldo(ContoBancario* accounts, int size) {
+
+    ContoBancario* maxAccount = &accounts[0]; // Assume the first account is the max
+
+    for (int i = 1; i < size; ++i) {
+        maxAccount = &confronta_Saldi(*maxAccount, accounts[i]);
+    }
+
+    return *maxAccount;
+}
+
+// sorting function goes here...
+
 // main
 int main() {
 
-    cout << "Inserisci il nome dell'intestatario: ";
+    int N;
+    cout << "Quanti conti bancari vuoi registrare? ";
+    cin >> N;
+        
+        // allocates raw memory that can contain N ContoBancario objects
+    void* memory = operator new[](N * sizeof(ContoBancario)); 
+        // casting memory ptr (void*) into a ContoBancario ptr
+    ContoBancario* accounts = static_cast<ContoBancario*>(memory);
+
+    int ID;
     char* nome = new char [20];
-    cin.getline(nome, 20);
-
     double saldo;
-    cout << "Ciao " << nome << ", inserisci il tuo saldo: ";
-    cin >> saldo;
 
-    // Istanza della Classe
-    ContoBancario cb(58886, nome, saldo);
+    for(size_t i = 0; i < N; i++) {
+        cout << "\nEnter accounts data:";
+        
+        cout << "\nID: ";
+        cin >> ID;
+        
+        cin.ignore();
+        cout << "\nIntestatario: ";
+        cin.getline(nome, 20);
 
-    // Manipolazione della Classe tramite l'Oggetto
-    int id;
-    cout << "Inserisci l'ID del tuo conto: ";
-    cin >> id;
-    
-    if(id != cb.get_numeroConto()) {
-        cout << "\nConto non valido.";
-        exit(EXIT_FAILURE);
-    } else {
-        cb.MostraDettagli();
+        cout << "\nSaldo: ";
+        cin >> saldo;
+
+        new (&accounts[i]) ContoBancario(ID, nome, saldo);
     }
     
-    // Deposito
-    char risposta;
-    double importo;
-    do {
-        cb.MostraSaldo();
-        cout << "[Inserisci l'importo da depositare nel tuo conto]: ";
-        cin >> importo;
+    delete [] nome;
+    
+    system("CLS");
+    for(size_t i = 0; i < N; i++) {
+        accounts[i].MostraDettagli();
+    }
 
-        cout << "Vuoi inserire altri soldi? ";
-        cin >> risposta;
+    // Operazioni con Funzione Friend
+    bonus_Saldo(accounts, N);
+    ContoBancario& richest_account = findMaxSaldo(accounts, N);
+    cout << "\nThe richest account belongs to " << richest_account.get_intestatario();
 
-        cb.Deposito(importo);
-    } while(risposta == 'y' || risposta == 'Y');
+    // create a function that sorts the elements in a growing order
+    // the call goes here...
 
-    // Prelievo
-    bool value;
-    do {
-        cb.MostraSaldo();
-        cout << "[Inserisci l'importo da prelevare dal tuo conto]: ";
-        cin >> importo;
+    // Freeing allocated memory
+    for (int i = 0; i < N; ++i) {
+    accounts[i].~ContoBancario();
+    }
 
-        value = cb.Prelievo(importo);
+    operator delete[](memory);
 
-        if(value) {
-            cout << "Vuoi prelevare altri soldi? ";
-            cin >> risposta; 
-        } else {
-            break;
-        }
-
-    } while((risposta == 'y' || risposta == 'Y'));
-
-    cb.MostraDettagli();
-
-    cout << "Hai diritto ad un BONUS !\n";
-    bonus_Saldo(cb);
-
-    cb.MostraDettagli();
-
-    // to use confronta_Saldi(...) add another object of the same class
-    // write here...
+    memory = nullptr;
 
     return 0;
 }
