@@ -13,15 +13,19 @@ class ContoBancario {
         double saldo;
     
     public:
+        static size_t counter;
+
         // Costruttore Default
         ContoBancario() : numeroConto(0), intestatario(nullptr), saldo(0.0) {
             intestatario = new char[1];
             intestatario[0] = '\0';
+            counter++;
         }
 
         // Costruttore con parametri
         ContoBancario(int nc, char* i, double s): numeroConto(nc), intestatario(new char [100]), saldo(s) {
             strcpy(intestatario, i);
+            counter++;
         } 
 
         // Metodi Getter
@@ -90,10 +94,16 @@ class ContoBancario {
 
         friend ContoBancario& confronta_Saldi(ContoBancario& cb1, ContoBancario& cb2);
 
+            // overloading output operator 
+        friend ostream& operator << (ostream& os, ContoBancario& cb);
+
+        // Distruttore
         ~ContoBancario() {
             delete [] intestatario;
         }
-};
+};  // ContoBancario{};
+
+size_t ContoBancario::counter = 0;  // init static var
 
 // Funzione Friend :D
 void bonus_Saldo(ContoBancario* accounts, int N) {
@@ -107,7 +117,7 @@ void bonus_Saldo(ContoBancario* accounts, int N) {
     do {
         if(ID == accounts[i].get_numeroConto()) {
             cout << "\n" << accounts[i].get_intestatario() << " has received a bonus!\n";
-            accounts[i].set_saldo(1500);
+            accounts[i].Deposito(1500);
             value = true;
         } else {
             value = false;
@@ -129,6 +139,11 @@ ContoBancario& confronta_Saldi(ContoBancario& cb1, ContoBancario& cb2) {
     } else {
         return cb2;
     }
+}
+
+ostream& operator << (ostream& os, ContoBancario& cb) {
+    os << "\nOverloading of <<\n" <<  cb.get_numeroConto() << " belongs to " << cb.get_intestatario() << " and it's current balance is " << cb.get_saldo() << "\n";
+    return os;
 }
 
 // Functions
@@ -166,17 +181,17 @@ void print_Accounts(ContoBancario* accounts, int N) {
     }
 }
 
-// main
-int main() {
+void free_memory(ContoBancario* accounts, int N, void* memory) {
+    for (int i = 0; i < N; ++i) {
+        accounts[i].~ContoBancario();
+    }
 
-    int N;
-    cout << "Quanti conti bancari vuoi registrare? ";
-    cin >> N;
-        
-        // allocates raw memory that can contain N ContoBancario objects
-    void* memory = operator new[](N * sizeof(ContoBancario)); 
-        // casting memory ptr (void*) into a ContoBancario ptr
-    ContoBancario* accounts = static_cast<ContoBancario*>(memory);
+    operator delete[](memory);
+
+    memory = nullptr;
+}
+
+void init_accounts(ContoBancario* accounts, int N) {
 
     int ID;
     char* nome = new char [20];
@@ -199,6 +214,18 @@ int main() {
     }
     
     delete [] nome;
+}
+
+// main
+int main() {
+
+    int N;
+    cout << "Quanti conti bancari vuoi registrare? ";
+    cin >> N;
+   
+    void* memory = operator new[](N * sizeof(ContoBancario));       // allocates raw memory that can contain N ContoBancario objects
+    ContoBancario* accounts = static_cast<ContoBancario*>(memory);  // casting memory ptr (void*) into a ContoBancario ptr
+    init_accounts(accounts, N);
     
     system("CLS");
     print_Accounts(accounts, N);
@@ -208,18 +235,16 @@ int main() {
     ContoBancario& richest_account = findMaxSaldo(accounts, N);
     cout << "\nThe richest account belongs to " << richest_account.get_intestatario() << "\n";
 
-    // create a function that sorts the elements in a growing order
+    cout << accounts[0]; // use of friend ostream& operator << function 
+
+    // just functions
     sort_Accounts(accounts, N);
     print_Accounts(accounts, N);
+    
+    cout << "\nTotal of instances: " << accounts[0].counter;    // printing static variable "counter"
 
     // Freeing allocated memory
-    for (int i = 0; i < N; ++i) {
-        accounts[i].~ContoBancario();
-    }
-
-    operator delete[](memory);
-
-    memory = nullptr;
+    free_memory(accounts, N, memory);
 
     return 0;
 }
