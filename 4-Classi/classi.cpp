@@ -132,18 +132,39 @@ ContoBancario& confronta_Saldi(ContoBancario& cb1, ContoBancario& cb2) {
 }
 
 // Functions
-ContoBancario& findMaxSaldo(ContoBancario* accounts, int size) {
+ContoBancario& findMaxSaldo(ContoBancario* accounts, int N) {
 
     ContoBancario* maxAccount = &accounts[0]; // Assume the first account is the max
 
-    for (int i = 1; i < size; ++i) {
+    for (size_t i = 1; i < N; ++i) {
         maxAccount = &confronta_Saldi(*maxAccount, accounts[i]);
     }
 
     return *maxAccount;
 }
 
-// sorting function goes here...
+void sort_Accounts(ContoBancario* accounts, int N) {
+
+    for(size_t i = 1; i < N; i++) {
+        double temp = accounts[i].get_saldo();
+
+        size_t j = i;
+        while((j > 0) && (temp < accounts[j - 1].get_saldo())) {
+            accounts[j].set_saldo(accounts[j - 1].get_saldo());
+            j--;
+        }
+
+        accounts[j].set_saldo(temp);
+    }
+
+    cout << "\nSorted accounts:\n";
+}
+
+void print_Accounts(ContoBancario* accounts, int N) {
+    for(size_t i = 0; i < N; i++) {
+        accounts[i].MostraDettagli();
+    }
+}
 
 // main
 int main() {
@@ -180,21 +201,20 @@ int main() {
     delete [] nome;
     
     system("CLS");
-    for(size_t i = 0; i < N; i++) {
-        accounts[i].MostraDettagli();
-    }
+    print_Accounts(accounts, N);
 
     // Operazioni con Funzione Friend
     bonus_Saldo(accounts, N);
     ContoBancario& richest_account = findMaxSaldo(accounts, N);
-    cout << "\nThe richest account belongs to " << richest_account.get_intestatario();
+    cout << "\nThe richest account belongs to " << richest_account.get_intestatario() << "\n";
 
     // create a function that sorts the elements in a growing order
-    // the call goes here...
+    sort_Accounts(accounts, N);
+    print_Accounts(accounts, N);
 
     // Freeing allocated memory
     for (int i = 0; i < N; ++i) {
-    accounts[i].~ContoBancario();
+        accounts[i].~ContoBancario();
     }
 
     operator delete[](memory);
