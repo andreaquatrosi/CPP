@@ -6,16 +6,15 @@ using namespace std;
 
 // Creazione Classe
 class ContoBancario {
-
     private:
         int numeroConto;
         char* intestatario;
         double saldo;
-    
+
     public:
         static size_t counter;
 
-        // Costruttore Default
+        // Costruttore di Default
         ContoBancario() : numeroConto(0), intestatario(nullptr), saldo(0.0) {
             intestatario = new char[1];
             intestatario[0] = '\0';
@@ -23,52 +22,66 @@ class ContoBancario {
         }
 
         // Costruttore con parametri
-        ContoBancario(int nc, char* i, double s): numeroConto(nc), intestatario(new char [100]), saldo(s) {
+        ContoBancario(int nc, const char* i, double s) : numeroConto(nc), saldo(s) {
+            intestatario = new char[strlen(i) + 1];
             strcpy(intestatario, i);
             counter++;
-        } 
+        }
+
+        // Costruttore di Copia
+        ContoBancario(const ContoBancario& other) : numeroConto(other.numeroConto), saldo(other.saldo) {
+            intestatario = new char[strlen(other.intestatario) + 1];
+            strcpy(intestatario, other.intestatario);
+        }
+
+        ContoBancario& operator=(const ContoBancario& other) {
+            if (this != &other) {
+                delete[] intestatario; // Free existing memory
+
+                numeroConto = other.numeroConto;
+                saldo = other.saldo;
+                intestatario = new char[strlen(other.intestatario) + 1];
+                strcpy(intestatario, other.intestatario);
+            }
+            return *this;
+        }   
 
         // Metodi Getter
         int get_numeroConto() const {
-
-            return this->numeroConto;
+            return numeroConto;
         }
 
-        char* get_intestatario() const {
-
-            return this->intestatario;
+        const char* get_intestatario() const {
+            return intestatario;
         }
 
         double get_saldo() const {
-
-            return this->saldo;
+            return saldo;
         }
 
         // Metodi Setter
         void set_numeroConto(int numeroConto) {
-            
             this->numeroConto = numeroConto;
         }
 
-        void set_intestatario(char* intestatario) {
+        void set_intestatario(const char* intestatario) {
+            delete [] this->intestatario;
             
+            this->intestatario = new char[strlen(intestatario) + 1];
             strcpy(this->intestatario, intestatario);
         }
 
         void set_saldo(double saldo) {
-            
             this->saldo = saldo;
         }
 
         // Funzionamento della Classe
         void Deposito(double importo) {
-
             saldo += importo;
         }
 
         bool Prelievo(double importo) {
-
-            if(saldo == 0 || importo > saldo) {
+            if (saldo < importo) {
                 cout << "\nSaldo insufficiente\n";
                 return false;
             } else {
@@ -77,81 +90,66 @@ class ContoBancario {
             }
         }
 
-        void MostraSaldo() {
+        void MostraSaldo() const {
             cout << "\nSaldo corrente: " << saldo << "\n";
         }
 
-        void MostraDettagli() {
+        void MostraDettagli() const {
             cout << "\nDettagli del Conto:"
-                 << "\nID conto: " << numeroConto
-                 << "\nIntestatario: " << intestatario
-                 << "\nSaldo: " << saldo
-                 << "\n";
+                << "\nID conto: " << numeroConto
+                << "\nIntestatario: " << intestatario
+                << "\nSaldo: " << saldo
+                << "\n";
         }
 
         // friend :D
-        friend void bonus_Saldo(ContoBancario* accounts, int );
-
+        friend void bonus_Saldo(ContoBancario* accounts, int N);
         friend ContoBancario& confronta_Saldi(ContoBancario& cb1, ContoBancario& cb2);
-
-            // overloading output operator 
-        friend ostream& operator << (ostream& os, ContoBancario& cb);
+        friend ostream& operator<<(ostream& os, const ContoBancario& cb);
 
         // Distruttore
         ~ContoBancario() {
             delete [] intestatario;
         }
-};  // ContoBancario{};
+};
 
 size_t ContoBancario::counter = 0;  // init static var
 
 // Funzione Friend :D
 void bonus_Saldo(ContoBancario* accounts, int N) {
-
     int ID;
-    cout << "\nWich account shall receive a bonus? [Enter account ID]: ";
+    cout << "\nWhich account shall receive a bonus? [Enter account ID]: ";
     cin >> ID;
 
-    size_t i = 0;
-    bool value;
-    do {
-        if(ID == accounts[i].get_numeroConto()) {
+    bool found = false;
+    for (int i = 0; i < N; ++i) {
+        if (ID == accounts[i].get_numeroConto()) {
             cout << "\n" << accounts[i].get_intestatario() << " has received a bonus!\n";
             accounts[i].Deposito(1500);
-            value = true;
-        } else {
-            value = false;
+            found = true;
+            break;
         }
-            
-        i++;
-    } while(!value && i < N);
+    }
 
-    if(!value) {
-        system("CLS");
+    if (!found) {
         cout << "\nThe given ID doesn't match an existing account.\n";
     }
 }
 
 ContoBancario& confronta_Saldi(ContoBancario& cb1, ContoBancario& cb2) {
-
-    if(cb1.get_saldo() > cb2.get_saldo()) {
-        return cb1;
-    } else {
-        return cb2;
-    }
+    return (cb1.get_saldo() > cb2.get_saldo()) ? cb1 : cb2;
 }
 
-ostream& operator << (ostream& os, ContoBancario& cb) {
-    os << "\nOverloading of <<\n" <<  cb.get_numeroConto() << " belongs to " << cb.get_intestatario() << " and it's current balance is " << cb.get_saldo() << "\n";
+ostream& operator<<(ostream& os, const ContoBancario& cb) {
+    os << "\nOverloading of <<\n" << cb.get_numeroConto() << " belongs to " << cb.get_intestatario() << " and its current balance is " << cb.get_saldo() << "\n";
     return os;
 }
 
-// Functions
+// just functions
 ContoBancario& findMaxSaldo(ContoBancario* accounts, int N) {
-
     ContoBancario* maxAccount = &accounts[0]; // Assume the first account is the max
 
-    for (size_t i = 1; i < N; ++i) {
+    for (int i = 1; i < N; ++i) {
         maxAccount = &confronta_Saldi(*maxAccount, accounts[i]);
     }
 
@@ -159,75 +157,63 @@ ContoBancario& findMaxSaldo(ContoBancario* accounts, int N) {
 }
 
 void sort_Accounts(ContoBancario* accounts, int N) {
+    for (int i = 1; i < N; i++) {
+        ContoBancario temp = accounts[i];
 
-    for(size_t i = 1; i < N; i++) {
-        double temp = accounts[i].get_saldo();
-
-        size_t j = i;
-        while((j > 0) && (temp < accounts[j - 1].get_saldo())) {
-            accounts[j].set_saldo(accounts[j - 1].get_saldo());
+        int j = i;
+        while (j > 0 && temp.get_saldo() < accounts[j - 1].get_saldo()) {
+            accounts[j] = accounts[j - 1];
             j--;
         }
 
-        accounts[j].set_saldo(temp);
+        accounts[j] = temp;
     }
 
     cout << "\nSorted accounts:\n";
 }
 
-void print_Accounts(ContoBancario* accounts, int N) {
-    for(size_t i = 0; i < N; i++) {
+void print_Accounts(const ContoBancario* accounts, int N) {
+    for (int i = 0; i < N; i++) {
         accounts[i].MostraDettagli();
     }
 }
 
 void free_memory(ContoBancario* accounts, int N, void* memory) {
-    for (int i = 0; i < N; ++i) {
-        accounts[i].~ContoBancario();
-    }
-
-    operator delete[](memory);
-
-    memory = nullptr;
+    operator delete [] (memory);
 }
 
 void init_accounts(ContoBancario* accounts, int N) {
+    for (int i = 0; i < N; i++) {
+        int ID;
+        char nome[100];
+        double saldo;
 
-    int ID;
-    char* nome = new char [20];
-    double saldo;
+        cout << "\nEnter account data:\n";
 
-    for(size_t i = 0; i < N; i++) {
-        cout << "\nEnter accounts data:";
-        
-        cout << "\nID: ";
+        cout << "ID: ";
         cin >> ID;
-        
-        cin.ignore();
-        cout << "\nIntestatario: ";
-        cin.getline(nome, 20);
 
-        cout << "\nSaldo: ";
+        cin.ignore();
+        cout << "Intestatario: ";
+        cin.getline(nome, 100);
+
+        cout << "Saldo: ";
         cin >> saldo;
 
         new (&accounts[i]) ContoBancario(ID, nome, saldo);
     }
-    
-    delete [] nome;
 }
 
 // main
 int main() {
-
     int N;
     cout << "Quanti conti bancari vuoi registrare? ";
     cin >> N;
-   
+
     void* memory = operator new[](N * sizeof(ContoBancario));       // allocates raw memory that can contain N ContoBancario objects
     ContoBancario* accounts = static_cast<ContoBancario*>(memory);  // casting memory ptr (void*) into a ContoBancario ptr
     init_accounts(accounts, N);
-    
-    system("CLS");
+
     print_Accounts(accounts, N);
 
     // Operazioni con Funzione Friend
@@ -237,11 +223,10 @@ int main() {
 
     cout << accounts[0]; // use of friend ostream& operator << function 
 
-    // just functions
     sort_Accounts(accounts, N);
     print_Accounts(accounts, N);
-    
-    cout << "\nTotal of instances: " << accounts[0].counter;    // printing static variable "counter"
+
+    cout << "\nTotal of instances: " << ContoBancario::counter << "\n";    // printing static variable "counter"
 
     // Freeing allocated memory
     free_memory(accounts, N, memory);
