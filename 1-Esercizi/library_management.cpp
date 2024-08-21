@@ -41,6 +41,7 @@ class Book {
             copies = book.copies;
         }
 
+        // Operator = Overloading
         Book& operator= (const Book& book) {
             if(this != &book) {
                 delete [] title;
@@ -74,12 +75,21 @@ class Book {
         // Setter
         void set_id(int id) { this->id = id; }
         void set_title(const char* title) {
+            
+            /*
+                it's important to delete [] previous pointers
+                to avoid memory leaks or undefined behaviours
+            */
             delete [] this->title;
 
             this->title = new char [strlen(title) + 1];
             strcpy(this->title, title);
         }
         void set_author(const char* author) {
+
+            /*
+                same thing here
+            */
             delete [] this->author;
 
             this->author = new char [strlen(author) + 1];
@@ -88,7 +98,6 @@ class Book {
         void set_copies(int copies) { this->copies = copies; }
 
         // Methods
-
         void add_copies(int n) {
             copies += n;
         }
@@ -116,14 +125,20 @@ class Book {
 class Library {
 
     private:
+        /*
+            the instance below allows me to manage more objects of the class Book
+            by using their properties and methods
+        */
         Book* books;
         int numBooks;
 
     public:
+        // Default
         Library() : books(nullptr), numBooks(0) {
             books = new Book [0];
         }
 
+        // Parametrized
         Library(int numBooks) : numBooks(numBooks) {
             books = new Book [numBooks];
         }
@@ -135,8 +150,13 @@ class Library {
         // Methods
         void add_book(size_t i, Book book) {
             
+            /*
+                this function allows to add a book in the Book's array
+                that already exists within the Library class
+                by copying the book parameter into it's place (i) in the array
+            */
             if(i < numBooks) {
-                books[i] = book; 
+                books[i] = book;
             } else {
                 cout << "\nInvalid index.\n";
             }
@@ -147,13 +167,13 @@ class Library {
             size_t i = 0;
             bool found = false;
             do {
-                if(books[i].get_id() == id) {
-                    books[i].add_copies(n);
+                if(books[i].get_id() == id) {   // get_copies() is Book's method
+                    books[i].add_copies(n);     // add_copies() is Book's method
                     found = true;
 
                     cout << "Incrementing copies of book ID " << id << "...\n";
                     cout << "Copies updated!\n";
-                    books[i].display();
+                    books[i].display();         // display() is Book's method
 
                     break;
                 }
@@ -164,35 +184,40 @@ class Library {
 
         void remove_ByID(int id) {
             
-            size_t i = 0;
-            bool found = false;
-            do {
-                if(id == books[i].get_id()) {
-                    for(size_t j = i; j > numBooks; j--) {
-                        books[j] = books[j - 1];
+            if(numBooks != 0) {
+                size_t i = 0;
+                bool found = false;
+                do {
+                    if(id == books[i].get_id()) {
+                        for(size_t j = i; j > numBooks; j--) {
+                            books[j] = books[j - 1];
+                        }
+
+                        numBooks--;
+                        found = true;
+
+                        cout << "\nFinding book by ID " << id << ":\n";
+                        books[i].display(); // display() is Book's method
                     }
+                } while(!found);
 
-                    numBooks--;
-                    found = true;
-
-                    cout << "\nFinding book by ID " << id << ":\n";
-                    books[i].display(); // display() is a function of Book class
-                }
-            } while(!found);
-
-            if(!found)
-                cout << "\nThe given ID doesn't match an existing one.\n";
+                if(!found)
+                    cout << "\nThe given ID doesn't match an existing one.\n";
+            }
         }
 
         void display_books() {
             
             cout << "\nBooks in the library:\n";
             for(size_t i = 0; i < numBooks; i++)
-                books[i].display(); // display() is a function of Book class
+                books[i].display(); // display() is Book's method
         }
 
         void sort_books() {
-
+            
+            /*
+                this functions sorts the elements by using insertion sort
+            */
             for(size_t i = 1; i < numBooks; i++) {
 
                 Book temp = books[i];
@@ -206,7 +231,7 @@ class Library {
                 books[j] = temp;
             }
 
-            cout << "\nSorted books:\n";
+            cout << "\nSorted book";
         }
 
         void search_ByTitle(const char* to_search)   {
@@ -216,9 +241,9 @@ class Library {
             size_t i = 0;
             bool found = false;
             do {
-                if(strcmp(books[i].get_title(), to_search) == 0) {
+                if(strcmp(books[i].get_title(), to_search) == 0) {  // get_title() is Book's method
                     found = true;
-                    books[i].display();
+                    books[i].display(); // display() is Book's method
                     break;
                 }
 
@@ -230,7 +255,8 @@ class Library {
         }
 
         void has_moreCopies() {
-            int max_copies = books[0].get_copies();
+
+            int max_copies = books[0].get_copies();     // get_copies() is Book's method
             size_t j = 0;
 
             for(size_t i = 0; i < numBooks; i++) {
@@ -267,6 +293,12 @@ int main() {
     cout << "How many books do you want to add? ";
     cin >> N;
     
+    /*
+        this is an instance of library
+        i'm calling it's Parametrized Constructor to initialize
+        numBooks with N and
+        allocating space for Book* books
+    */
     Library library(N);
     
     for(size_t i = 0; i < N; i++) {
@@ -295,17 +327,17 @@ int main() {
         library.add_book(i, book);
     }
 
+    // Functions Calls
     system("CLS");
     library.display_books();
-
-    // friend
-    cout << "\nWich book are you searching for?\n";
+    
+    cout << "\nWich book are you searching for? [Title]\n";
     char* to_search = new char [512];
     cin.getline(to_search, 512);
     
     library.search_ByTitle(to_search);
     
-    cout << "\nOf wich book would you like to add copies? ";
+    cout << "\nOf wich book would you like to add copies? [ID]\n";
     int id;
     cin >> id;
 
