@@ -86,7 +86,85 @@ class Book {
             strcpy(this->author, author);
         }
         void set_copies(int copies) { this->copies = copies; }
+
+        // Methods
+
+        void add_copies(int n) {
+            copies += n;
+        }
+
+        void delete_copies(int n) {
+            if((n > copies)||(copies == 0)) {
+                cout << "\nUnable to delete copies.\n";
+                exit(EXIT_FAILURE);
+            } else { 
+                copies -= n;
+                cout << "\nCopies successfully deleted.\n";
+            }
+        }
+
+        void display() {
+            cout << "\nID: " << id
+                << "\nTitle: " << title
+                << "\nAuthor: " << author
+                << "\nCopies: " << copies
+                << "\n"; 
+        }
+
+        // friend :D
+        friend void search_ByTitle(Book* book, int N, const char* to_search);
+        friend void has_moreCopies(Book* book, int N);
+        friend ostream& operator<< (ostream& os, const Book& book);
 };
+
+// friend functions
+void search_ByTitle(Book* book, int N, const char* to_search) {
+
+    cout << "\nFinding book by title '" << to_search << "':\n";
+
+    size_t i = 0;
+    bool found = false;
+    do {
+        if(strcmp(book[i].get_title(), to_search) == 0) {
+            found = true;
+            book[i].display();
+            break;
+        }
+
+        i++;
+    } while ((!found) && (i < N));
+
+    if(!found)
+        cout << "\nThe given title doesn't exist.\n";
+}
+
+void has_moreCopies(Book* book, int N) {
+    int max_copies = book[0].get_copies();
+    size_t j = 0;
+
+    for(size_t i = 0; i < N; i++) {
+        if(max_copies < book[i].get_copies()) {
+            max_copies = book[i].get_copies();
+            j = i;
+        }
+    }
+
+    cout << "\nBook with the most copies:\n";
+    book[j].display();
+}
+
+ostream& operator<< (ostream& os, Book& book) {
+    os << "\nDisplaying using Operator << Overload:\n"
+       << "ID: " << book.get_id()
+       << "\nTitle: " << book.get_title()
+       << "\nAuthor: " << book.get_author()
+       << "\nCopies: " << book.get_copies()
+       << "\n";
+
+    return os;
+}
+
+// Library Class goes here...
 
 int main() {
 
@@ -98,27 +176,49 @@ int main() {
 
     for(size_t i = 0; i < N; i++) {
         int ID, copies;
+        
+        cout << "\nEnter details for book " << i+1 << "\n";
 
+        cout << "ID: ";
         cin >> ID;
         
         cin.ignore();
+        cout << "Title: ";
         char* title = new char [512];
         cin.getline(title, 512);
 
+        cout << "Author: ";
         char* author = new char [512];
         cin.getline(author, 512);
 
+        cout << "Copies: ";
         cin >> copies;
         cin.ignore();
 
         new (&book[i]) Book(ID, title, author, copies);
     }
 
-    for(size_t i = 0; i < N; i++) {
-        cout << "\nID: " << book[i].get_id()
-             << "\nTitle: " << book[i].get_title()
-             << "\nAuthor: " << book[i].get_author()
-             << "\nCopies: " << book[i].get_copies()
-             << "\n"; 
-    }
+    system("CLS");
+    cout << "Books in the library:\n";
+    for(size_t i = 0; i < N; i++)
+        book[i].display();
+
+    // friend
+    cout << "\nWich book are you searching for?\n";
+    char* to_search = new char [512];
+    cin.getline(to_search, 512);
+
+    search_ByTitle(book, N, to_search);
+    has_moreCopies(book, N);
+
+    // operator << overload
+    cout << book[0];
+
+    /*Book book_copy(book[0]);  // using Copy Constructor
+    cout << book_copy;*/
+
+    // Modify the previous lines of main() by using a Library object
+    // instead of a Book object
+
+    return 0;
 }
