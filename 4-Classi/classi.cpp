@@ -34,6 +34,10 @@ class MyClass {
             counter++;
         }
 
+        ~MyClass() {
+            delete [] name;
+        }
+
         // Getter
         int get_Data() const { return data; }
 
@@ -81,6 +85,8 @@ class MyDerivedClass : public MyClass {
         // Parametrized Constructor
         // chiama il costruttore della classe base
         MyDerivedClass(int data, char* name, double extraData) : MyClass(data, name), extraData(extraData) {}
+
+        ~MyDerivedClass() {}
 
         // Getter
         double get_extraData() const { return extraData; }
