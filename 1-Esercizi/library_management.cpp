@@ -119,7 +119,28 @@ class Book {
                 << "\nCopies: " << copies
                 << "\n"; 
         }
+
+        // friend
+        friend ostream& operator<< (ostream& os, Book& book);
 };
+
+// friend
+ostream& operator<< (ostream& os, Book& book) {
+
+    /*
+        friend function only works if it's prototype
+        is found inside the class of wich private attributes
+        we want to have access
+    */
+    os << "\nDisplaying using Operator << Overload:\n"
+        << "ID: " << book.id
+        << "\nTitle: " << book.title
+        << "\nAuthor: " << book.author
+        << "\nCopies: " << book.copies
+        << "\n";
+
+    return os;
+}
 
 // Library {};
 class Library {
@@ -269,23 +290,7 @@ class Library {
             cout << "\nBook with the most copies:\n";
             books[j].display();
         }
-
-        // friend
-        friend ostream& operator<< (ostream& os, Book& book);
 };
-
-// friend
-ostream& operator<< (ostream& os, Book& book) {
-    
-    os << "\nDisplaying using Operator << Overload:\n"
-        << "ID: " << book.get_id()
-        << "\nTitle: " << book.get_title()
-        << "\nAuthor: " << book.get_author()
-        << "\nCopies: " << book.get_copies()
-        << "\n";
-
-    return os;
-}
 
 int main() {
 
