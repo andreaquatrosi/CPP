@@ -4,33 +4,31 @@
 
 using namespace std;
 
-// Definizione della classe
+// Definizione della classe template
+template<typename T>
 class MyClass {
 
     private:
-        int data;
+        T data;
         char* name;
         static size_t counter;
 
     public:
         // Default
-        MyClass() : data(0), name(nullptr) {
+        MyClass() : data(T()), name(nullptr) {
             name = new char [1];
             name[0] = '\0';
         }                      
 
         // Parametrized
-        MyClass(int d, const char* name) : data(d), name(new char [strlen(name) + 1]) { 
-            
+        MyClass(T d, const char* name) : data(d), name(new char [strlen(name) + 1]) { 
             strcpy(this->name, name);
             counter++; 
         }     
         
         // Copy
-        MyClass(MyClass& obj) {  
-                               
-            data = obj.get_Data();
-            strcpy(name, obj.get_Name());
+        MyClass(const MyClass& obj) : data(obj.get_Data()), name(new char [strlen(obj.get_Name()) + 1]) {
+            strcpy(this->name, obj.get_Name());
             counter++;
         }
 
@@ -39,12 +37,12 @@ class MyClass {
         }
 
         // Getter
-        int get_Data() const { return data; }
+        T get_Data() const { return data; }
 
-        char* get_Name() const { return name; }
+        const char* get_Name() const { return name; }
 
         // Setter
-        void set_Data(int data) { this->data = data; }
+        void set_Data(T data) { this->data = data; }
 
         void set_Name(const char* name) {
             delete [] this->name;
@@ -57,26 +55,25 @@ class MyClass {
         /*virtual*/ void display() const;
 
         // Friend
-        friend void add_data(int to_add, MyClass& obj);
+        friend void add_data(T to_add, MyClass& obj) {
+            obj.data += to_add;
+        }
 };
 
-void MyClass::display() const {
-
+template<typename T>
+void MyClass<T>::display() const {
     cout << "MyClass::display()"
          << "\nData: " << data
          << "\nName: " << name
          << "\n";
 }
 
-size_t MyClass::counter = 0;
+template<typename T>
+size_t MyClass<T>::counter = 0;
 
-// Friend
-void add_data(int to_add, MyClass& obj) {
-     
-    obj.data += to_add;
-}
-
-class MyDerivedClass : public MyClass {
+// Classe derivata da MyClass
+template <typename T>
+class MyDerivedClass : public MyClass<double> {
     
     private:
         double extraData;
@@ -84,7 +81,8 @@ class MyDerivedClass : public MyClass {
     public:
         // Parametrized Constructor
         // chiama il costruttore della classe base
-        MyDerivedClass(int data, char* name, double extraData) : MyClass(data, name), extraData(extraData) {}
+        MyDerivedClass(T data, const char* name, double extraData) 
+            : MyClass<double>(data, name), extraData(extraData) {}
 
         ~MyDerivedClass() {}
 
@@ -96,8 +94,7 @@ class MyDerivedClass : public MyClass {
 
         // Metodo
         void display() const {
-
-            MyClass::display();
+            MyClass<double>::display();
             cout << "MyDerivedClass::display()"
                  << "\nExtra Data: " << extraData
                  << "\n";
@@ -106,7 +103,7 @@ class MyDerivedClass : public MyClass {
 
 int main() {
     // Creazione di un oggetto della classe MyClass
-    MyClass obj_b(42, "Andrea");
+    MyClass<double> obj_b(42.5, "Andrea");
 
     // Utilizzo dei metodi della classe
     obj_b.display();
@@ -119,16 +116,15 @@ int main() {
     obj_b.display();
     
     // Creazione di un oggetto della classe MyDerivedClass
-    char* name = new char [10];
-    strcpy(name, "Andrea");
+    const char* name = "Andrea";
     cout << "\nCalling display() in the derived object\n";
-    MyDerivedClass obj_d(69, name, 420.69);
+    MyDerivedClass obj_d(69.5, name, 420.69);
 
     obj_d.display();
 
     // Ptr
     cout << "\nUsing pointer to MyDerivedClass\n";
-    MyClass* ptr = &obj_d;
+    MyClass<double>* ptr = &obj_d;
     ptr->display();         // Chiama MyClass::display() (binding statico)
                             // Aggiungere "virtual" alla riga 53 per chiamare MyDerivedClass::display() (binding dinamico)
 
