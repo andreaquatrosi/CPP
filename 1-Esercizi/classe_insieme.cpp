@@ -91,6 +91,7 @@ class Insieme {
         }
 
         void svuotare() {
+
             if(interi) {
                 for(size_t i = 0; i < dimensione; i++)
                     interi[i] = 0;
@@ -117,6 +118,7 @@ class Insieme {
         }
 
         void elimina(size_t i) {
+
             if(interi) {
                 if(i <= dimensione || interi[i] != 0) {
                     cout << "\nElemento " << interi[i] << " eliminato correttamente\n";
@@ -132,6 +134,7 @@ class Insieme {
         }
 
         void unisce(Insieme ins) {
+
             if(interi) {
 
                 int* copia = new int [dimensione];
@@ -172,8 +175,9 @@ class Insieme {
                 }
 
                 return false;
-            } else
-                cout << "\nImpossibile usare membro(), l'insieme non esiste...\n";
+            }
+            
+            cout << "\nImpossibile usare membro(), l'insieme non esiste...\n";
             
             return false; 
         }
