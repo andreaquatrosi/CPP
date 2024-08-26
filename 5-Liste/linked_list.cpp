@@ -39,6 +39,8 @@ class List {
                 delete current;
                 current = nextNode;
             }
+
+            delete nextNode;
         }
 
         // Operazioni
@@ -46,15 +48,10 @@ class List {
 
         void push_head(T value) {
 
-            Node<T>* newNode = new Node<T>(value);
+            Node<T>* newNode = new Node<T>(value); // creazione Nodo
 
-            if(this->is_Empty()) {
-                newNode->set_next(head);
-                head = newNode;
-            } else {
-                newNode->set_next(head);
-                head = newNode;
-            }
+            newNode->set_next(head);    // newNode points to the current head
+            head = newNode;             // newNode is the new head
         }
 
         void push_tail(T value) {
@@ -67,10 +64,10 @@ class List {
             } else {
                 Node<T>* temp = head;
 
-                while(temp->get_next() != nullptr)
+                while(temp->get_next() != nullptr)      // going through the list 'till the last but one node
                     temp = temp->get_next();
 
-                temp->set_next(newNode);
+                temp->set_next(newNode);                // setting the last but one node to points to the newNode
             }
         }
 
@@ -185,8 +182,8 @@ class List {
 int main() {
     
     List<int> list;
-    
-    /*list.push_head(69);
+    /*
+    list.push_head(69);
     list.push_tail(420);
     list.push_head(90);
     list.push_tail(45);
@@ -203,8 +200,8 @@ int main() {
     list.push_tail(100);
     list.print_list();
 
-    int value3 = list.extract_element(42);*/
-
+    int value3 = list.extract_element(42);
+    */
     list.push_sorted(50);
     list.push_sorted(20);
     list.push_sorted(60);
