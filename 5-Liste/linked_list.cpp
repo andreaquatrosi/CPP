@@ -159,7 +159,11 @@ class List {
                 if(temp == nullptr)
                     return false;
 
-                prev->set_next(temp->get_next());
+                if(prev == nullptr)
+                    head = head->get_next();
+                else    
+                    prev->set_next(temp->get_next());
+                    
                 delete temp;
 
                 return true;
