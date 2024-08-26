@@ -106,6 +106,79 @@ class List {
             }       
         }
 
+        T extract_head() {
+
+            if(this->is_Empty()) {
+                cout << "\nThe list's empty!\n";
+                exit(EXIT_FAILURE);
+            } else {
+
+                Node<T>* temp = head;
+                T value = head->get_value();
+                head = head->get_next();
+
+                if(head != nullptr)
+                    head->set_prev(nullptr);
+
+                delete temp;
+
+                return value;
+            }
+        }
+
+        T extract_tail() {
+
+            if(this->is_Empty()) {
+                cout << "\nThe list's empty!\n";
+                exit(EXIT_FAILURE);
+            } else {
+
+                Node<T>* temp = head;
+
+                while(temp->get_next() != nullptr)
+                    temp = temp->get_next();
+                
+                T value = temp->get_value();
+
+                if(temp->get_prev() != nullptr)
+                    temp->get_prev()->set_next(nullptr);
+                else
+                    head = nullptr;
+                
+                delete temp;
+
+                return value;
+            }
+        }
+
+        bool extract_element(T value) {
+
+            if(this->is_Empty()) {
+                cout << "\nThe list's empty\n";
+                exit(EXIT_FAILURE);
+            } else {
+
+                Node<T>* temp = head;
+
+                while(temp != nullptr && value != temp->get_value())
+                    temp = temp->get_next();
+
+                if(temp == nullptr)
+                    return false;
+                
+                if(temp->get_prev() != nullptr)
+                    temp->get_prev()->set_next(temp->get_next());
+                else    head = temp->get_next();    // element is in the head
+
+                if(temp->get_next() != nullptr)
+                    temp->get_next()->set_prev(temp->get_prev());
+                
+                delete temp;
+
+                return true;
+            }
+        }
+
         void print() const {
 
             Node<T>* current = head;
@@ -134,6 +207,12 @@ int main() {
     list.push_sorted(60);
     list.push_sorted(30);
     list.push_sorted(40);
+
+    list.print();
+
+    list.extract_head();
+    list.extract_tail();
+    list.extract_element(30);
 
     list.print();
 
