@@ -36,7 +36,7 @@ void print(int** mtx, size_t N, size_t M) {
 }
 
 // Scrive Matrice su File
-void write_Matrix(int** mtx, size_t N, size_t M, const char* fileName) {
+void  write_Matrix(int** mtx, size_t N, size_t M, const char* fileName) {
 
     ofstream fout(fileName, ios::app);
 
