@@ -211,16 +211,47 @@ class Stack {
 };
 
 int main() {
-    Stack<int> stack;
+    Stack<char*> stack;
     
-    stack.push(10);
-    stack.push(20);
-    stack.push(30);
+    cout << "Welcome to your -stack type- shopping list!\n";
+    int response;
 
-    stack.print_stack();
+    while(response != -1) {
+        cout << "\nChoose your operation:\n"
+             << "1. Add item\n"
+             << "2. Clear item\n"
+             << "3. Print shopping list\n"
+             << "-1. Exit\n";
+        
+        cin >> response;
 
-    cout << "Elemento rimosso: " << stack.pop() << endl;
-    stack.print_stack();
+        char* item = new char [126];
+        switch (response) {
+            case 1:
+                cin.ignore();
+                cin.getline(item, 126);
+                stack.push(item);
+                break;
+            
+            case 2:
+                cout << "\nItem cleared.\n";
+                stack.pop();
+                break;
+            
+            case 3:
+                cout << "\nShopping list:\n";
+                stack.print_stack();
+                break;
+            
+            case -1:
+                cout << "\nNow exiting...\n";
+                break;
+
+            default:
+                cout << "\nInvalid option...\n";
+                break;
+        }
+    }
 
     return 0;
 }

@@ -211,16 +211,47 @@ class Queue {
 };
 
 int main() {
-    Queue<int> queue;
+    Queue<char*> queue;
     
-    queue.enqueue(10);
-    queue.enqueue(20);
-    queue.enqueue(30);
+    cout << "Welcome to your -queue type- shopping list!\n";
+    int response;
 
-    queue.print_queue();
+    while(response != -1) {
+        cout << "\nChoose your operation:\n"
+             << "1. Add item\n"
+             << "2. Clear item\n"
+             << "3. Print shopping list\n"
+             << "-1. Exit\n";
+        
+        cin >> response;
 
-    cout << "Elemento rimosso: " << queue.dequeue() << endl;
-    queue.print_queue();
+        char* item = new char [126];
+        switch (response) {
+            case 1:
+                cin.ignore();
+                cin.getline(item, 126);
+                queue.enqueue(item);
+                break;
+            
+            case 2:
+                cout << "\nItem cleared.\n";
+                queue.dequeue();
+                break;
+            
+            case 3:
+                cout << "\nShopping list:\n";
+                queue.print_queue();
+                break;
+            
+            case -1:
+                cout << "\nNow exiting...\n";
+                break;
+
+            default:
+                cout << "\nInvalid option...\n";
+                break;
+        }
+    }
 
     return 0;
 }
