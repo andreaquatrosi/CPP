@@ -124,20 +124,30 @@ class List {
         }
 };
 
-int main() {
+template <typename T>
+void read_file(const char* fileName, List<T>& list) {
 
-    List<int> list;
-
-    ifstream fin("text.txt");
+    ifstream fin(fileName);
 
     if(!fin) {
         cerr << "\nError while opening the file...\n";
-        return -1;
+        return;
     }
 
     int value;
     while(fin >> value)
         list.push_sorted(value);
+}
+
+int main() {
+
+    List<int> list;
+
+    cout << "Input file name: ";
+    char* fileName = new char [126];
+    cin.getline(fileName, 126);
+
+    read_file(fileName, list);
 
     list.display();
 
