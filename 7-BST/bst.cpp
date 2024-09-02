@@ -189,8 +189,6 @@ int main() {
     
     cout << "\nIn-Order visit:\n";
     bst.inOrder();
-
-    // bst.delete_node(1);
     
     cout << "\nPre-Order visit:\n";
     bst.preOrder();
@@ -199,8 +197,8 @@ int main() {
     bst.postOrder();
 
     cout << "\nAfter deleting: " << nodes[2] << " and " << nodes[1] << ":\n";
-    bst.delete_node(2);
-    bst.delete_node(5);
+    bst.delete_node(nodes[2]);
+    bst.delete_node(nodes[5]);
 
     bst.inOrder();
 
