@@ -81,8 +81,7 @@ class MyDerivedClass : public MyClass<double> {
     public:
         // Parametrized Constructor
         // chiama il costruttore della classe base
-        MyDerivedClass(T data, const char* name, double extraData) 
-            : MyClass<double>(data, name), extraData(extraData) {}
+        MyDerivedClass(T data, const char* name, double extraData) : MyClass<double>(data, name), extraData(extraData) {}
 
         ~MyDerivedClass() {}
 
