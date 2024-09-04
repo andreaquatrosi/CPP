@@ -10,8 +10,8 @@ class Node {
         Node<T>* prev;
 
     public:
-        Node() : value(T()), next(nullptr) {}
-        Node(T value) : value(value), next(nullptr) {}
+        Node() : value(T()), next(nullptr), prev(nullptr) {}
+        Node(T value) : value(value), next(nullptr), prev(nullptr) {}
 
         // Getter
         T get_value() const { return value; }
@@ -19,7 +19,7 @@ class Node {
         Node<T>* get_prev() { return prev; }
 
         // Setter
-        void set_value(const T value) { this->value = value; }
+        void set_value(const T value) {this->value = value; }
         void set_next(Node<T>* next) { this->next = next; }
         void set_prev(Node<T>* prev) { this->prev = prev; }
 };
@@ -34,8 +34,9 @@ class List {
         List() : head(nullptr), tail(nullptr) {}
 
         ~List() {
+
             Node<T>* current = head;
-            Node<T>* nextNode;
+            Node<T>* nextNode = nullptr;
 
             while(current != nullptr) {
                 nextNode = current->get_next();
@@ -43,18 +44,20 @@ class List {
                 current = nextNode;
             }
 
-            delete nextNode;
+            if(nextNode)
+                delete nextNode;
         }
 
         // Operazioni
         bool is_empty() { return head == nullptr; }
-    
+
         void push_head(const T value) {
             
             Node<T>* newNode = new Node<T>(value);
 
             if(this->is_empty()) {
                 head = tail = newNode;
+                
                 return;
             }
 
@@ -69,16 +72,17 @@ class List {
 
             if(this->is_empty()) {
                 head = tail = newNode;
+                
                 return;
             }
 
-            tail->set_next(newNode);
             newNode->set_prev(tail);
+            tail->set_next(newNode);
             tail = newNode;
         }
 
         void push_sorted(const T value) {
-
+            
             Node<T>* newNode = new Node<T>(value);
 
             if(this->is_empty() || value < head->get_value()) {
@@ -88,34 +92,31 @@ class List {
                     head->set_prev(newNode);
                 
                 head = newNode;
-
+                
                 if(tail == nullptr)
-                tail = newNode;
-
+                    tail = newNode;
+                
+                return;
             }
 
             else if(value > tail->get_value()) {
-                tail->set_next(newNode);
                 newNode->set_prev(tail);
+                tail->set_next(newNode);
                 tail = newNode;
+
+                return;
             }
 
-            else {
-                Node<T>* current = head;
+            Node<T>* current = head;
 
-                while(current->get_next() != nullptr && value > current->get_next()->get_value()) {
-                    current = current->get_next();
-                }
+            while(current != nullptr && value > current->get_value())
+                current = current->get_next();
 
-                newNode->set_next(current->get_next());
+            current->get_prev()->set_next(newNode);
+            newNode->set_prev(current->get_prev());
 
-                if(current->get_next() != nullptr) {
-                    current->get_next()->set_prev(newNode);
-                }
-
-                current->set_next(newNode);
-                newNode->set_prev(current);
-            }
+            newNode->set_next(current);
+            current->set_prev(newNode);
         }
 
         T extract_head() {
@@ -124,7 +125,6 @@ class List {
                 exit(EXIT_FAILURE);
 
             Node<T>* temp = head;
-
             T value = head->get_value();
             head = head->get_next();
 
@@ -144,7 +144,6 @@ class List {
                 exit(EXIT_FAILURE);
 
             Node<T>* temp = tail;
-
             T value = tail->get_value();
             tail = tail->get_prev();
 
@@ -158,42 +157,44 @@ class List {
             return value;
         }
 
-        bool extract_element(T value) {
-            
+        bool extract_element(const T value) {
+
             if(this->is_empty())
                 exit(EXIT_FAILURE);
-            
-            Node<T>* temp = head;
 
+            if(value == head->get_value()) {
+                extract_head();
+                return true;
+            }
+
+            else if(value == tail->get_value()) {
+                extract_tail();
+                return true;
+            }
+
+            Node<T>* temp = head;
+            
             while(temp != nullptr && value != temp->get_value())
                 temp = temp->get_next();
-            
-            if(temp == nullptr) // not found
+
+            if(temp == nullptr)
                 return false;
 
-            // found
-            if(temp->get_prev() != nullptr)
-                temp->get_prev()->set_next(temp->get_next());
-            else
-                head = temp->get_next();    // element is in the head
-
-            if(temp->get_next() != nullptr)
-                temp->get_next()->set_prev(temp->get_prev());
-            else
-                tail = temp->get_prev();    // element is in the tail
+            temp->get_prev()->set_next(temp->get_next());
+            temp->get_next()->set_prev(temp->get_prev());
 
             delete temp;
 
             return true;
         }
+        
+        void display() const {
 
-        void print_list() const {
-
-            Node<T>* current = head;
+            Node<T>* current = head; // current = tail to inverse print the list
 
             while(current != nullptr) {
                 cout << current->get_value() << " -> ";
-                current = current->get_next();
+                current = current->get_next();  // current->get_prev()
             }
 
             cout << "nullptr\n";
@@ -204,19 +205,34 @@ int main() {
 
     List<int> list;
 
-    list.push_sorted(50);
-    list.push_sorted(20);
-    list.push_sorted(60);
-    list.push_sorted(30);
-    list.push_sorted(40);
+    /*list.push_head(10);
+    list.push_tail(5);
+    list.push_head(7);
+    list.push_tail(3);*/
 
-    list.print_list();
+    list.push_head(1);
+    list.push_sorted(10);
+    list.push_sorted(5);
+    list.push_sorted(7);
+    list.push_sorted(3);
+    list.push_sorted(6);
+    list.push_sorted(0);
+    list.push_tail(11);
+
+    list.display();
+
+    if(list.extract_element(15))
+        cout << "found\n";
+    else
+        cout << "not found\n";
+
+    list.display();
 
     list.extract_head();
-    list.extract_tail();
-    list.extract_element(30);
+    list.display();
 
-    list.print_list();
+    list.extract_tail();
+    list.display();
 
     return 0;
 }
