@@ -46,15 +46,8 @@ class List {
         // Operazioni
         bool is_Empty() { return head == nullptr; }
 
-        void push_head(T value) {
-
-            Node<T>* newNode = new Node<T>(value); // creazione Nodo
-
-            newNode->set_next(head);    // newNode points to the current head
-            head = newNode;             // newNode is the new head
-        }
-
-        void push_tail(T value) {
+        //   push_tail
+        void enqueue(T value) { 
 
             Node<T>* newNode = new Node<T>(value);
 
@@ -71,29 +64,8 @@ class List {
             }
         }
 
-        void push_sorted(T value) {
-            
-            Node<T>* newNode = new Node<T>(value);
-
-            if(this->is_Empty() || value < head->get_value()) {
-                newNode->set_next(head);
-                head = newNode;
-            } else {
-                Node<T>* current = head;
-                Node<T>* prev = nullptr;
-
-                while(current != nullptr && current->get_value() < value) {
-                    prev = current;
-                    current = current->get_next();
-                }
-
-                newNode->set_next(current);
-                if(prev != nullptr)
-                    prev->set_next(newNode);
-            }
-        }
-
-        T extract_head() {
+       // extract_head
+        T dequeue() {   
 
             if(this->is_Empty()) {
                 cout << "\nEmpty list!\n";
@@ -109,68 +81,7 @@ class List {
             }
         }
 
-        T extract_tail() {
-
-            if(this->is_Empty()) {
-                cout << "\nEmpty list!\n";
-                exit(EXIT_FAILURE);
-            } else {
-                Node<T>* temp = head;
-                Node<T>* prev = nullptr;
-
-                while(temp->get_next() != nullptr) {
-                    prev = temp;
-                    temp = temp->get_next();
-                }
-
-                T value = temp->get_value();
-
-                if(prev != nullptr)
-                    prev->set_next(nullptr);
-                else
-                    head = nullptr; // the list has only one element
-
-                delete temp;
-
-                return value;
-            }
-        }
-
-        bool extract_element(T value) {
-
-            if(this->is_Empty()) {
-                cout << "\nEmpty list!\n";
-                exit(EXIT_FAILURE);
-            } else {
-
-                if(value == head->get_value()) {
-                    extract_head();
-                    return true;
-                }
-
-                Node<T>* temp = head;
-                Node<T>* prev = nullptr;
-
-                while(temp != nullptr && value != temp->get_value()) {
-                    prev = temp;
-                    temp = temp->get_next();
-                }
-
-                if(temp == nullptr)
-                    return false;
-
-                if(prev == nullptr)
-                    head = head->get_next();
-                else    
-                    prev->set_next(temp->get_next());
-                    
-                delete temp;
-
-                return true;
-            }
-        }
-
-        void print_list() const {
+        void display() const {
             
             Node<T>* temp = head;
 
@@ -191,12 +102,12 @@ class Queue {
     public:
         // Aggiunge un elemento in fondo alla coda
         void enqueue(T value) {
-            list.push_tail(value);
+            list.enqueue(value);
         }
 
         // Rimuove e restituisce l'elemento all'inizio della coda
         T dequeue() {
-            return list.extract_head();
+            return list.dequeue();
         }
 
         // Controlla se la coda è vuota
@@ -206,7 +117,7 @@ class Queue {
 
         // Stampa gli elementi nella coda
         void print_queue() const {
-            list.print_list();
+            list.display();
         }
 };
 
@@ -216,7 +127,7 @@ int main() {
     cout << "Welcome to your -queue type- shopping list!\n";
     int response;
 
-    while(response != -1) {
+    do {
         cout << "\nChoose your operation:\n"
              << "1. Add item\n"
              << "2. Clear item\n"
@@ -251,7 +162,7 @@ int main() {
                 cout << "\nInvalid option...\n";
                 break;
         }
-    }
+    } while(response != -1);
 
     return 0;
 }
