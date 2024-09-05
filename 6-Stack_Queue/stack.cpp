@@ -31,20 +31,12 @@ class List {
         List() : head(nullptr) {}
 
         ~List() {
-            Node<T>* current = head;
-            Node<T>* nextNode;
-
-            while(current != nullptr) {
-                nextNode = current->get_next();
-                delete current;
-                current = nextNode;
-            }
-
-            delete nextNode;
+            while(!is_empty())
+                pop();
         }
 
         // Operazioni
-        bool is_Empty() { return head == nullptr; }
+        bool is_empty() { return head == nullptr; }
 
         //   push_head
         void push(T value) {
@@ -58,7 +50,7 @@ class List {
        // extract_head
         T pop() {
 
-            if(this->is_Empty()) {
+            if(this->is_empty()) {
                 cout << "\nEmpty list!\n";
                 exit(EXIT_FAILURE);
             } else {
@@ -103,7 +95,7 @@ class Stack {
 
         // Controlla se la pila è vuota
         bool is_empty() const {
-            return list.is_Empty();
+            return list.is_empty();
         }
 
         // Stampa gli elementi nella pila

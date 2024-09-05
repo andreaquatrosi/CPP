@@ -31,27 +31,19 @@ class List {
         List() : head(nullptr) {}
 
         ~List() {
-            Node<T>* current = head;
-            Node<T>* nextNode;
-
-            while(current != nullptr) {
-                nextNode = current->get_next();
-                delete current;
-                current = nextNode;
-            }
-
-            delete nextNode;
+            while(!is_empty())
+                dequeue();
         }
 
         // Operazioni
-        bool is_Empty() { return head == nullptr; }
+        bool is_empty() { return head == nullptr; }
 
         //   push_tail
         void enqueue(T value) { 
 
             Node<T>* newNode = new Node<T>(value);
 
-            if(this->is_Empty()) {
+            if(this->is_empty()) {
                 newNode->set_next(head);
                 head = newNode;
             } else {
@@ -67,7 +59,7 @@ class List {
        // extract_head
         T dequeue() {   
 
-            if(this->is_Empty()) {
+            if(this->is_empty()) {
                 cout << "\nEmpty list!\n";
                 exit(EXIT_FAILURE);
             } else {
@@ -100,6 +92,7 @@ class Queue {
         List<T> list; // Usa la lista per implementare la coda
 
     public:
+
         // Aggiunge un elemento in fondo alla coda
         void enqueue(T value) {
             list.enqueue(value);
@@ -112,7 +105,7 @@ class Queue {
 
         // Controlla se la coda è vuota
         bool is_empty() const {
-            return list.is_Empty();
+            return list.is_empty();
         }
 
         // Stampa gli elementi nella coda
