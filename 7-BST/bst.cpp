@@ -152,6 +152,17 @@ class BST {
                 return root;
         }
 
+        int height(Node<T>* root) {
+            
+            if(!root)
+                return -1;
+            
+            int leftHeight = height(root->get_left());
+            int rightHeight = height(root->get_right());
+
+            return 1 + max(leftHeight, rightHeight);
+        }
+
     public:
         BST() : root(nullptr) {}
 
@@ -175,6 +186,10 @@ class BST {
         void postOrder() const {
             postOrder(root);
         }
+
+        int height() {
+            return height(root);
+        }
 };
 
 int main() {
@@ -182,7 +197,7 @@ int main() {
     BST<int> bst;
 
     constexpr size_t N = 8;
-    int nodes[N] = {1, 5, 2, 4, 10, 8, 3, 9};
+    int nodes[N] = {10, 5, 7, 12, 3, 15, 11, 4};
 
     for(size_t i = 0; i < N; i++)
         bst.add_node(nodes[i]);
@@ -196,11 +211,15 @@ int main() {
     cout << "\nPost-Order visit:\n";
     bst.postOrder();
 
-    cout << "\nAfter deleting: " << nodes[2] << " and " << nodes[1] << ":\n";
+    cout << "\nThe height of the BST is: " << bst.height() << "\n";    
+
+    cout << "\nAfter deleting: " << nodes[4] << " and " << nodes[N-1] << ":\n";
     bst.delete_node(nodes[2]);
     bst.delete_node(nodes[5]);
 
     bst.inOrder();
+
+    cout << "\nThe height of the BST is: " << bst.height() << "\n";
 
     return 0;
 }
