@@ -4,7 +4,6 @@ using namespace std;
 
 template <typename T>
 class Node {
-
     private:
         T value;
         Node<T>* next;
@@ -15,15 +14,15 @@ class Node {
 
         // Getter
         T get_value() const { return value; }
-        Node<T>* get_next() const { return this->next; }
+        Node<T>* get_next() { return next; }
 
         // Setter
+        void set_value(T value) { this->value = value; }
         void set_next(Node<T>* next) { this->next = next; }
 };
 
 template <typename T>
 class List {
-
     private:
         Node<T>* head;
 
@@ -31,55 +30,58 @@ class List {
         List() : head(nullptr) {}
 
         ~List() {
+
             while(!is_empty())
                 dequeue();
         }
 
-        // Operazioni
         bool is_empty() { return head == nullptr; }
 
-        //   push_tail
-        void enqueue(T value) { 
+        void enqueue(const T value) {
 
             Node<T>* newNode = new Node<T>(value);
 
-            if(this->is_empty()) {
-                newNode->set_next(head);
+            if(is_empty()) {
                 head = newNode;
-            } else {
-                Node<T>* temp = head;
 
-                while(temp->get_next() != nullptr)      // going through the list 'till the last but one node
-                    temp = temp->get_next();
-
-                temp->set_next(newNode);                // setting the last but one node to points to the newNode
+                return;
             }
+
+            Node<T>* current = head;
+
+            while(current->get_next() != nullptr)
+                current = current->get_next();
+
+            current->set_next(newNode);
         }
 
-       // extract_head
-        T dequeue() {   
+        T dequeue() {
 
-            if(this->is_empty()) {
-                cout << "\nEmpty list!\n";
+            if(is_empty())
                 exit(EXIT_FAILURE);
-            } else {
-                Node<T>* temp = head;
-                T value = head->get_value();
-                head = head->get_next();
 
-                delete temp;
-                
-                return value;
-            }
+            Node<T>* temp = head;
+
+            T value = head->get_value();
+            head = head->get_next();
+
+            delete temp;
+
+            return value;
+        }
+
+        T peek() {
+
+            return head->get_value();
         }
 
         void display() const {
             
-            Node<T>* temp = head;
+            Node<T>* current = head;
 
-            while(temp != nullptr) {
-                cout << temp->get_value() << " -> ";
-                temp = temp->get_next();
+            while(current != nullptr) {
+                cout << current->get_value() << " -> ";
+                current = current->get_next();
             }
 
             cout << "nullptr\n";
@@ -89,73 +91,64 @@ class List {
 template <typename T>
 class Queue {
     private:
-        List<T> list; // Usa la lista per implementare la coda
+        List<T> list;
 
     public:
-
-        // Aggiunge un elemento in fondo alla coda
-        void enqueue(T value) {
+        void enqueue(const T value) {
             list.enqueue(value);
         }
 
-        // Rimuove e restituisce l'elemento all'inizio della coda
-        T dequeue() {
-            return list.dequeue();
+        void dequeue() {
+            list.dequeue();
         }
 
-        // Controlla se la coda è vuota
-        bool is_empty() const {
-            return list.is_empty();
+        T peek() {
+            return list.peek();
         }
 
-        // Stampa gli elementi nella coda
-        void print_queue() const {
+        void display() {
             list.display();
         }
 };
 
 int main() {
-    Queue<char*> queue;
-    
-    cout << "Welcome to your -queue type- shopping list!\n";
-    int response;
+
+    Queue<int> queue;
+
+    int risposta;
 
     do {
-        cout << "\nChoose your operation:\n"
-             << "1. Add item\n"
-             << "2. Clear item\n"
-             << "3. Print shopping list\n"
-             << "-1. Exit\n";
-        
-        cin >> response;
+        cout << "Scegli un opzione [Inserire -1 per uscire]:";
+        cout << "\n[1] Enqueue: "
+             << "\n[2] Dequeue: "
+             << "\n[3] Peek: "
+             << "\n[4] Display: "
+             << "\n";
+        cin >> risposta;
 
-        char* item = new char [126];
-        switch (response) {
+        system("CLS");
+
+        switch(risposta) {
             case 1:
-                cin.ignore();
-                cin.getline(item, 126);
-                queue.enqueue(item);
+                int value;
+                cout << "\nInserisci un valore: ";
+                cin >> value;
+
+                queue.enqueue(value);
                 break;
-            
             case 2:
-                cout << "\nItem cleared.\n";
                 queue.dequeue();
                 break;
-            
             case 3:
-                cout << "\nShopping list:\n";
-                queue.print_queue();
+                cout << "\nLa coda e': " << queue.peek() << "\n";
                 break;
-            
-            case -1:
-                cout << "\nNow exiting...\n";
+            case 4:
+                queue.display();
                 break;
-
             default:
-                cout << "\nInvalid option...\n";
-                break;
+                cout << "\nNow exiting...\n";
         }
-    } while(response != -1);
-
+    } while(risposta != -1);
+    
     return 0;
 }

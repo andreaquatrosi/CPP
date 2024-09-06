@@ -4,7 +4,6 @@ using namespace std;
 
 template <typename T>
 class Node {
-
     private:
         T value;
         Node<T>* next;
@@ -15,137 +14,140 @@ class Node {
 
         // Getter
         T get_value() const { return value; }
-        Node<T>* get_next() const { return this->next; }
+        Node<T>* get_next() { return next; }
 
         // Setter
+        void set_value(T value) { this->value = value; }
         void set_next(Node<T>* next) { this->next = next; }
 };
 
 template <typename T>
 class List {
-
     private:
         Node<T>* head;
 
     public:
         List() : head(nullptr) {}
-
+        
         ~List() {
-            while(!is_empty())
+            if(!is_empty())
                 pop();
         }
 
         // Operazioni
         bool is_empty() { return head == nullptr; }
 
-        //   push_head
-        void push(T value) {
+        void push(const T value) {
 
-            Node<T>* newNode = new Node<T>(value); // creazione Nodo
+            Node<T>* newNode = new Node<T>(value);
 
-            newNode->set_next(head);    // newNode points to the current head
-            head = newNode;             // newNode is the new head
+            if(is_empty()) {
+                head = newNode;
+
+                return;
+            }
+
+            newNode->set_next(head);
+            head = newNode;
         }
 
-       // extract_head
         T pop() {
 
-            if(this->is_empty()) {
-                cout << "\nEmpty list!\n";
+            if(is_empty())
                 exit(EXIT_FAILURE);
-            } else {
-                Node<T>* temp = head;
-                T value = head->get_value();
-                head = head->get_next();
 
-                delete temp;
-                
-                return value;
-            }
-        }
-
-        void print_list() const {
-            
             Node<T>* temp = head;
 
-            while(temp != nullptr) {
-                cout << temp->get_value() << " -> ";
-                temp = temp->get_next();
+            T value = head->get_value();
+            head = head->get_next();
+
+            delete temp;
+
+            return value;
+        }
+
+        T peek() {
+
+            if(is_empty())
+                exit(EXIT_FAILURE);
+
+            return head->get_value();
+        }
+
+        void display() const {
+
+            Node<T>* current = head;
+
+            while(current != nullptr) {
+                cout << current->get_value() << "\n";
+                current = current->get_next();
             }
 
-            cout << "nullptr\n";
+            cout << "\n";
         }
 };
 
 template <typename T>
 class Stack {
     private:
-        List<T> list; // Usa la lista per implementare la pila
+        List<T> list;
 
     public:
-        // Aggiunge un elemento in cima alla pila
-        void push(T value) {
+        void push(const T value) {
             list.push(value);
         }
 
-        // Rimuove e restituisce l'elemento in cima alla pila
-        T pop() {
-            return list.pop();
+        void pop() {
+            list.pop();
         }
 
-        // Controlla se la pila è vuota
-        bool is_empty() const {
-            return list.is_empty();
+        T peek() {
+            return list.peek();
         }
 
-        // Stampa gli elementi nella pila
-        void print_stack() const {
-            list.print_list();
+        void display() const {
+            list.display();
         }
 };
 
 int main() {
-    Stack<char*> stack;
-    
-    cout << "Welcome to your -stack type- shopping list!\n";
-    int response;
+
+    Stack<int> stack;
+
+    int risposta;
 
     do {
-        cout << "\nChoose your operation:\n"
-             << "1. Add item\n"
-             << "2. Clear item\n"
-             << "3. Print shopping list\n"
-             << "-1. Exit\n";
-        
-        cin >> response;
+        cout << "Scegli un opzione [Inserire -1 per uscire]:";
+        cout << "\n[1] Push: "
+             << "\n[2] Pop: "
+             << "\n[3] Peek: "
+             << "\n[4] Display: "
+             << "\n";
+        cin >> risposta;
 
-        char* item = new char [126];
-        switch (response) {
+        system("CLS");
+
+        switch(risposta) {
             case 1:
-                cin.ignore();
-                cin.getline(item, 126);
-                stack.push(item);
+                int value;
+                cout << "\nInserisci un valore: ";
+                cin >> value;
+
+                stack.push(value);
                 break;
-            
             case 2:
-                cout << "\nItem cleared.\n";
                 stack.pop();
                 break;
-            
             case 3:
-                cout << "\nShopping list:\n";
-                stack.print_stack();
+                cout << "\nLa testa e': " << stack.peek() << "\n";
                 break;
-            
-            case -1:
-                cout << "\nNow exiting...\n";
+            case 4:
+                stack.display();
                 break;
-
             default:
-                cout << "\nInvalid option...\n";
-                break;
+                cout << "\nNow exiting...\n";
         }
-    } while(response != -1);
+    } while(risposta != -1);
 
     return 0;
 }
