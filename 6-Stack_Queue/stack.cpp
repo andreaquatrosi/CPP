@@ -18,7 +18,7 @@ class Node {
 
         // Setter
         void set_value(T value) { this->value = value; }
-        void set_next(Node<T>* next) { this->next = next; }
+        void set_next(Node<T>* next) { this->next = next; } 
 };
 
 template <typename T>
@@ -28,7 +28,7 @@ class List {
 
     public:
         List() : head(nullptr) {}
-        
+
         ~List() {
             if(!is_empty())
                 pop();
@@ -66,21 +66,18 @@ class List {
             return value;
         }
 
-        T peek() {
-
-            if(is_empty())
-                exit(EXIT_FAILURE);
+        T peek() const {
 
             return head->get_value();
         }
 
         void display() const {
 
-            Node<T>* current = head;
+            Node<T>* temp = head;
 
-            while(current != nullptr) {
-                cout << current->get_value() << "\n";
-                current = current->get_next();
+            while(temp != nullptr) {
+                cout << temp->get_value() << "\n";
+                temp = temp->get_next();
             }
 
             cout << "\n";
@@ -97,8 +94,8 @@ class Stack {
             list.push(value);
         }
 
-        void pop() {
-            list.pop();
+        T pop() {
+            return list.pop();
         }
 
         T peek() {
