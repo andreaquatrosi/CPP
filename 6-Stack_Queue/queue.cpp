@@ -17,7 +17,7 @@ class Node {
         Node<T>* get_next() { return next; }
 
         // Setter
-        void set_value(T value) { this->value = value; }
+        void set_value(const T value) { this->value = value; }
         void set_next(Node<T>* next) { this->next = next; }
 };
 
@@ -29,9 +29,9 @@ class List {
 
     public:
         List() : head(nullptr), tail(nullptr) {}
-
+        
         ~List() {
-            while (!is_empty())
+            if(!is_empty())
                 dequeue();
         }
 
@@ -39,27 +39,30 @@ class List {
         bool is_empty() { return head == nullptr; }
 
         void enqueue(const T value) {
+
             Node<T>* newNode = new Node<T>(value);
 
-            if (is_empty()) {
+            if(is_empty()) {
                 head = tail = newNode;
-            } else {
-                tail->set_next(newNode); // Link the current tail to the new node
-                tail = newNode;           // Update tail to the new node
+
+                return;
             }
+
+            tail->set_next(newNode);
+            tail = newNode;
         }
 
         T dequeue() {
-            if (is_empty()) {
-                cout << "Queue is empty!" << endl;
-                exit(EXIT_FAILURE); // Or throw an exception
-            }
+
+            if(is_empty())
+                exit(EXIT_FAILURE);
 
             Node<T>* temp = head;
+
             T value = head->get_value();
             head = head->get_next();
 
-            if (head == nullptr)
+            if(head == nullptr)
                 tail = nullptr;
 
             delete temp;
@@ -68,18 +71,20 @@ class List {
         }
 
         T peek() const {
+
             return head->get_value();
         }
 
         void display() const {
+
             Node<T>* current = head;
 
-            while (current != nullptr) {
+            while(current != nullptr) {
                 cout << current->get_value() << " -> ";
                 current = current->get_next();
             }
 
-            cout << "nullptr\n";
+            cout << "\n";
         }
 };
 
@@ -93,20 +98,21 @@ class Queue {
             list.enqueue(value);
         }
 
-        void dequeue() {
-            list.dequeue();
+        T dequeue() {
+            return list.dequeue();
         }
 
         T peek() const {
             return list.peek();
         }
 
-        void display() {
+        void display() const {
             list.display();
         }
 };
 
 int main() {
+    
     Queue<int> queue;
 
     int risposta;
