@@ -2,61 +2,53 @@
 
 using namespace std;
 
-void merge(int* A, size_t p, size_t q, size_t r) {
-
-    size_t n1 = q-p+1; // Dimensione sotto-array L
-    size_t n2 = r-q;  // Dimensione sotto-array R
-
-    int* L = new int [n1+1];
-    int* R = new int [n2+1];
-
-    size_t i = 0, j = 0;
+template <typename T>
+void merge(T* array, size_t left, size_t mid, size_t right) {
     
-    // Inizializzo L con gli elementi di sinistra di A
-    for(i = 0; i < n1; i++) {
-        L[i] = A[p+i];
-    }
+    int n1 = mid - left + 1;
+    int n2 = right - mid;
 
-    // Inizializzo R con gli elementi di destra di A
-    for(j = 0; j < n2; j++) {
-        R[j] = A[q+1+j];
-    }
+    T* L = new T [n1];
+    T* R = new T [n2];
+
+    size_t i = 0;
+    for(i; i < n1; i++)
+        L[i] = array[left + i];
+    
+    size_t j = 0;
+    for(j; j < n2; j++)
+        R[j] = array[mid + 1 + j];
 
     i = j = 0;
+    size_t k = left;
 
-    L[n1] = R[n2] = INT_MAX;  // Elementi sentinella  
-
-    for(size_t k = p; k <= r; k++) {
-        if(L[i] < R[j]) {
-            A[k] = L[i];
-            i++;
-        } else {
-            A[k] = R[j];
-            j++;
-        }
+    while(i < n1 && j < n2) {
+        if(L[i] <= R[j])
+            array[k++] = L[i++];
+        else
+            array[k++] = R[j++];
     }
 
-    delete [] L;
-    L = nullptr;
+    while(i < n1)
+        array[k++] = L[i++];
 
+    while(j < n2)
+        array[k++] = R[j++];
+
+    delete [] L;
     delete [] R;
-    R = nullptr;
 }
 
-void mergeSort(int* A, size_t p, size_t r) {
+template <typename T>
+void mergeSort(T* array, size_t left, size_t right) {
 
-    // p = left
-    // r = right
+    if(left < right) {
+        size_t mid = left + (right - left)/2;
 
-    if(p < r) {
+        mergeSort(array, left, mid);
+        mergeSort(array, mid + 1, right);
 
-        // q = mid
-        size_t q = (p+r)/2; // suddivido l'array in due parti
-        
-        // applico il merge sort fino a quando i sotto-array hanno dimensione = 1
-        mergeSort(A, p, q);     // suddivido ricorsivamente la prima metà
-        mergeSort(A, q+1, r);   // suddivido ricorsivamente la seconda metà
-        merge(A, p, q, r);      // unisco le due metà
+        merge(array, left, mid, right);
     }
 }
 

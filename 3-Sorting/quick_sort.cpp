@@ -2,41 +2,39 @@
 
 using namespace std;
   
-void swap(int& a, int& b) {
-
-    int t = a;
+template <typename T>
+void _swap(T& a, T& b) { 
+    T t = a;
     a = b;
     b = t;
 }
 
-int partition(int* A, size_t p, size_t r) {
-
-    size_t i = p-1;
-    size_t j = p;
-
-    int& pivot = A[r];
-
-    while(j < r) {
-        if(A[j] <= pivot) {
-            i++;
-            swap(A[i], A[j]);
-        }
+template <typename T>
+int partition(T* array, size_t low, size_t high) {
     
-        j++;
+    T pivot = array[high];
+    size_t i = low - 1;
+
+    for(size_t j = low; j < high; j++) {
+        if(array[j] <= pivot) {
+            i++;
+            _swap(array[i], array[j]);
+        }
     }
 
-    swap(pivot, A[i+1]);
-
-    return i+1;
+    _swap(array[i + 1], array[high]);
+    
+    return (i + 1);
 }
 
-void quickSort(int* A, size_t p, size_t r) {
+template <typename T>
+void quickSort(T* array, size_t low, size_t high) {
 
-    if(p < r) {
-        int q = partition(A, p, r);
-    
-        quickSort(A, p, q-1);
-        quickSort(A, q+1, r);
+    if(low < high) {
+        int p = partition(array, low, high);
+
+        quickSort(array, low, p - 1);
+        quickSort(array, p + 1, high);
     }
 }
 
