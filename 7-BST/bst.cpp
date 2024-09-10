@@ -175,6 +175,14 @@ class BST {
             delete_node(root, key);
         }
 
+        int height() {
+            return height(root);
+        }
+
+        Node<T>* search_node(const T& key) {
+            return search_node(root, key);
+        }
+
         void inOrder() const {
             inOrder(root);
         }
@@ -185,10 +193,6 @@ class BST {
 
         void postOrder() const {
             postOrder(root);
-        }
-
-        int height() {
-            return height(root);
         }
 };
 
@@ -214,12 +218,19 @@ int main() {
     cout << "\nThe height of the BST is: " << bst.height() << "\n";    
 
     cout << "\nAfter deleting: " << nodes[4] << " and " << nodes[N-1] << ":\n";
-    bst.delete_node(nodes[2]);
-    bst.delete_node(nodes[5]);
+    bst.delete_node(nodes[4]);
+    bst.delete_node(nodes[N-1]);
 
     bst.inOrder();
 
     cout << "\nThe height of the BST is: " << bst.height() << "\n";
+
+    cout << "\nSearching node " << nodes[4] << "...\n";
+    
+    if(bst.search_node(nodes[4]))
+        cout << "found\n";
+    else
+        cout << "not found\n";
 
     return 0;
 }
