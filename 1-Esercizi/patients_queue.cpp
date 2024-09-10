@@ -27,34 +27,34 @@ class Node {
 };
 
 template <typename T>
-class List {
+class Queue {
     private:
         Node<T>* head;
         Node<T>* tail;
 
     public:
-        List() : head(nullptr), tail(nullptr) {}
-        
-        ~List() {
-            if(!is_empty())
+        Queue() : head(nullptr), tail(nullptr) {}
+
+        ~Queue() {
+            while(!is_empty())
                 dequeue();
         }
 
         // Operazioni
         bool is_empty() { return head == nullptr; }
 
-        void enqueue(const T value, const string priority) {
+        void enqueue(const T& value, const string& priority) {
 
             Node<T>* newNode = new Node<T>(value, priority);
 
-            if(is_empty()) {
-                head = tail = newNode;
-
-                return;
-            }
-
-            // Checking priority
             if(priority == "Green") {
+                
+                if(is_empty()) {
+                    head = tail = newNode;
+
+                    return;
+                }
+
                 tail->set_next(newNode);
                 tail = newNode;
             }
@@ -74,13 +74,13 @@ class List {
                     head = newNode;
 
                     return;
-                }  
+                }
 
                 else {
                     prev->set_next(newNode);
                     newNode->set_next(current);
                 }
-                
+
                 if(newNode->get_next() == nullptr)
                     tail = newNode;
             }
@@ -92,12 +92,8 @@ class List {
                 exit(EXIT_FAILURE);
 
             Node<T>* temp = head;
-
             T value = head->get_value();
             head = head->get_next();
-
-            if(head == nullptr)
-                tail = nullptr;
 
             delete temp;
 
@@ -118,30 +114,7 @@ class List {
                 current = current->get_next();
             }
 
-            cout << "\n";
-        }
-};
-
-template <typename T>
-class Queue {
-    private:
-        List<T> list;
-
-    public:
-        void enqueue(const T value, const string priority) {
-            list.enqueue(value, priority);
-        }
-
-        T dequeue() {
-            return list.dequeue();
-        }
-
-        T peek() const {
-            return list.peek();
-        }
-
-        void display() const {
-            list.display();
+            cout << "nullptr\n";
         }
 };
 
