@@ -85,7 +85,6 @@ class List {
             while(getline(fin, line)) {
 
                 size_t pos = 0;
-                string token;
 
                 // find title
                 pos = line.find(';');
