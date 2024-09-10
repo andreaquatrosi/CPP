@@ -109,7 +109,7 @@ class List {
 
             Node<T>* current = head;
 
-            while(current != nullptr && value > current->get_value())
+            while(value > current->get_value())
                 current = current->get_next();
 
             current->get_prev()->set_next(newNode);
