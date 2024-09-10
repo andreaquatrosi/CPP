@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cstdlib>
+#include <string>
 #include <fstream>
 
 using namespace std;
@@ -28,7 +29,7 @@ void print(int* A, size_t N) {
 }
 
 // Scrive Array su File
-void write_Array(int* A, size_t N, const char* fileName) {
+void write_Array(int* A, size_t N, const string fileName) {
 
     ofstream fout(fileName, ios::app);
 
@@ -62,12 +63,11 @@ void dealloc_Array(int* A) {
 
 int main() {
 
-    char* fileName = new char [100];
+    string fileName;
     cout << "Enter file name: ";
-    cin.getline(fileName, 100);
+    getline(cin, fileName);
 
     constexpr size_t N = 8;
-
     int* array = init_Array(N);
 
     // func. calls
