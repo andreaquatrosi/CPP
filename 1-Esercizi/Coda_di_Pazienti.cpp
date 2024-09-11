@@ -169,7 +169,6 @@ int main() {
 
         switch(risposta) {
             case 1:
-                
                 cout << "\nInserisci l'ID del paziente: ";
                 cin >> id;
 
