@@ -1,3 +1,9 @@
+/* 
+    Solution but:
+        - Not using a queue for the borrowed items
+        - Not using arrays of Students/Professors in library class
+*/
+
 #include <iostream>
 #include <string>
 
@@ -83,6 +89,13 @@ class Person {
             borrowedItems = new Item* [maxItems];
             for(size_t i = 0; i < maxItems; i++)
                 borrowedItems[i] = nullptr;
+        }
+
+        ~Person() {
+            for(size_t i = 0; i < currentItems; i++)
+                borrowedItems[i] = nullptr;
+
+            delete [] borrowedItems;
         }
 
         void borrowItem(Item* item) {
