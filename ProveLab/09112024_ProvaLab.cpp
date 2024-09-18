@@ -65,7 +65,7 @@ class Person {
         string name;
         string surname;
 
-        Item** borrowedItems;
+        Item** borrowedItems; // try to do this as a queue of borrowed items
         size_t currentItems;
         int maxItems;
 
