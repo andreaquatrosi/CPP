@@ -326,7 +326,7 @@ int main() {
         cout << "\nUpdated borrowed items: ";
         u1.printItems();
 
-        cout << "\nGoodbye.\n";   
+        cout << "\nExiting from the library...\n";   
     }
 
     return 0;
