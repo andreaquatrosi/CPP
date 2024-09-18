@@ -1,9 +1,3 @@
-/* 
-    Solution but:
-        - Not using a queue for the borrowed items
-        - Not using arrays of Students/Professors in library class
-*/
-
 #include <iostream>
 #include <string>
 
@@ -13,31 +7,26 @@ using namespace std;
 class Item {
     protected:
         string title;
-        double publicationDate; // MM.YYYY
+        double publicationDate;
         int id;
 
         bool isAvaible;
-    
+
     public:
         Item() : title(""), publicationDate(0.0f), id(0), isAvaible(true) {}
 
         Item(const string& title, const double& publicationDate, const int& id) : title(title), publicationDate(publicationDate), id(id), isAvaible(true) {}
 
+        virtual void display() const {
+            cout << "\ntitle: " << title << " - publication date: " << publicationDate << " - ID: " << id << "\n"; 
+        }
+
         // Getter
+        bool get_isAvaible() const { return isAvaible; }
         int get_id() const { return id; }
-        bool get_isAvaible() const { return isAvaible;}
 
         // Setter
         void set_isAvaible(bool isAvaible) { this->isAvaible = isAvaible; }
-
-        // Methods
-        virtual void printItem() const {
-            
-            cout << "\nTitle: " << title
-                 << "\nPublication Date: " << publicationDate
-                 << "\nID: " << id
-                 << "\n";
-        }
 };
 
 class Book : public Item {
@@ -50,15 +39,14 @@ class Book : public Item {
         Book(const string& author, const string& title, const double& publicationDate, const int& id) : author(author), Item(title, publicationDate, id) {}
 
         // Methods
-        void printItem() const override {
-
+        void display() const override {
             cout << "\nBook - " << title << " - " << author << " - " << id << "\n";
         }
 };
 
 class DVD : public Item {
     private:
-        int duration;   // n-minutes
+        int duration;
 
     public:
         DVD() : duration(0), Item() {}
@@ -66,8 +54,7 @@ class DVD : public Item {
         DVD(const int& duration, const string& title, const double& publicationDate, const int& id) : duration(duration), Item(title, publicationDate, id) {}
 
         // Methods
-        void printItem() const override {
-
+        void display() const override {
             cout << "\nDVD - " << title << " - " << duration << " - " << id << "\n";
         }
 };
@@ -91,64 +78,61 @@ class Person {
                 borrowedItems[i] = nullptr;
         }
 
-        ~Person() {
-            for(size_t i = 0; i < currentItems; i++)
-                borrowedItems[i] = nullptr;
-
-            delete [] borrowedItems;
-        }
-
+        // Methods
         void borrowItem(Item* item) {
-            if(currentItems < maxItems && item->get_isAvaible()) {
-                borrowedItems[currentItems++] = item;
 
+            if(currentItems < maxItems && item->get_isAvaible() && item) {
+                borrowedItems[currentItems++] = item;
                 item->set_isAvaible(false);
+
+                cout << "\nBorrowed Item: ";
+                item->display(); 
+            }
+
+            else if(!item->get_isAvaible()){
+                cout << "\nThe item is not avaible at the moment...\n";
+                item->display();
             }
 
             else {
-                if(!item->get_isAvaible())
-                    cout << "\nItem " << item->get_id() << " is not avaible at the moment.\n";
-                else
-                    cout << "\nYou can no longer take any more products.\n";
+                cout << "\nYou can no longer borrow any more items.\n";
             }
         }
 
-        void returnItem(Item* item) {
+        void returnItems(int id) {
             
-            bool itemFound = false;
-            size_t j = 0;
-
-            for (size_t i = 0; i < currentItems; i++) {
-                if (item->get_id() == borrowedItems[i]->get_id()) {
-                    item->set_isAvaible(true);
+            bool found = false;
+            size_t j;
+            for(size_t i = 0; i < currentItems; i++) {
+                if(id == borrowedItems[i]->get_id()) {
                     j = i;
-                    itemFound = true;
+                    found = true;
+
+                    borrowedItems[i]->set_isAvaible(true);
+                    borrowedItems[i] = nullptr;
 
                     break;
                 }
             }
 
-            if(itemFound) {
-                
-                for(size_t i = j; i < currentItems - 1; i++) {
-                    borrowedItems[i] = borrowedItems[i + 1];
+            if(found) {
+                for(size_t i = j; i < currentItems; i++) {
+                    borrowedItems[i] = borrowedItems[i+1];
                 }
-                borrowedItems[currentItems - 1] = nullptr;  
-                currentItems--; 
-            } 
-            
+
+                currentItems--;
+            }
+
             else {
-                cout << "\nYou don't have this item.\n";
+                cout << "\nThe given ID doesn't exists in your borrowed items.\n";
             }
         }
 
-        // Methods
         virtual void printItems() const {
-            
-            cout << "\nItems borrowed:\n";
-            for(size_t i = 0; i < currentItems; i++) {
-                borrowedItems[i]->printItem();
-            }
+
+            cout << "\nCurrently borrowed items: ";
+            for(size_t i = 0; i < currentItems; i++)
+                borrowedItems[i]->display();
         }
 };
 
@@ -156,14 +140,14 @@ class Student : public Person {
     public:
         Student() : Person() {}
 
-        Student(const string& name, const string& surname) : Person(name, surname, 5) {}
+        Student(const string& name, const string& surname, int maxItems) : Person(name, surname, maxItems) {}
 };
 
 class Professor : public Person {
     public:
         Professor() : Person() {}
 
-        Professor(const string& name, const string& surname) : Person(name, surname, 10) {}
+        Professor(const string& name, const string& surname, int maxItems) : Person(name, surname, maxItems) {}
 };
 
 // LIBRARY
@@ -171,68 +155,179 @@ class Library {
     private:
         string name;
 
-    public:
-        Library() : name("") {}
-        
-        Library(const string& name, const int& numStud, const int& numProf) : name(name) {}
+        Item** items;
+        size_t maxItems;
 
-        // Methods
-        void borrowItem(Person* person, Item* item) {
-            person->borrowItem(item);
+        int counter_items;
+
+    public:
+        Library() : name(""), items(nullptr), maxItems(0), counter_items(0) {}
+
+        Library(const string& name, size_t maxItems) : name(name), maxItems(maxItems), counter_items(0) {
+            items = new Item* [maxItems];
+            for(size_t i = 0; i < maxItems; i++) {
+                items[i] = nullptr;
+            }
         }
 
-        void returnItem(Person* person, Item* item) {
-            person->returnItem(item);
+        void add_book() {
+            
+            if(counter_items < maxItems) {
+                cout << "\nInsert title: ";
+                string title;
+                getline(cin, title);
+
+                cout << "\nInsert author: ";
+                string author;
+                getline(cin, author);
+
+                cout << "\nInsert publication date: ";
+                double pubDate;
+                cin >> pubDate;
+
+                cout << "\nInsert id: ";
+                int id;
+                cin >> id;
+                cin.ignore();
+
+                items[counter_items++] = new Book(author, title, pubDate, id);
+            }
+        }
+
+        void add_dvd() {
+            
+            if(counter_items < maxItems) {
+                cout << "\nInsert title: ";
+                string title;
+                getline(cin, title);
+
+                cout << "\nInsert duration: ";
+                int duration;
+                cin >> duration;
+
+                cout << "\nInsert publication date: ";
+                double pubDate;
+                cin >> pubDate;
+
+                cout << "\nInsert id: ";
+                int id;
+                cin >> id;
+                cin.ignore();
+
+                items[counter_items++] = new DVD(duration, title, pubDate, id);
+            }
+        }
+
+        void borrowItem(Person* person) {
+
+            cout << "\nWich item do you want to borrow? [Insert ID] ";
+            int id;
+            cin >> id;
+            
+            for(size_t i = 0; i < maxItems; i++) {
+                if(id == items[i]->get_id()) {
+                    person->borrowItem(items[i]);
+                    
+                    break;
+                }
+            }
+        }
+
+        void returnItem(Person* person) {
+            cout << "\nWhich item do you want to return? [Insert ID] ";
+            person->printItems();
+            
+            int id;
+            cin >> id;
+
+            person->returnItems(id);
+        }
+
+        void printItems() const {
+            
+            for(size_t i = 0; i < maxItems; i++) {
+                if(items[i]->get_isAvaible())
+                    items[i]->display();
+            }
         }
 };
 
 // MAIN
 int main() {
 
-    Library lib("Library", 3, 2);
+    cout << "\nWelcome to your library! How many items do you want to add in the library? ";
+    int nItems;
+    cin >> nItems;
 
-    Book b1("A", "A", 1.2024, 1111);
-    Book b2("B", "B", 2.2024, 2222);
-    Book b3("C", "C", 3.2024, 3333);
-    Book b4("D", "D", 4.2024, 4444);
-    Book b5("E", "E", 5.2024, 5555);
+    Library lib("Libreria", nItems);
 
-    DVD d1(111, "F", 6.2024, 6666);
-    DVD d2(111, "G", 7.2024, 7777);
-    DVD d3(111, "H", 8.2024, 8888);
-    DVD d4(111, "I", 9.2024, 9999);
-    DVD d5(111, "J", 10.2024, 0000);
+    int response;
+    for(size_t i = 0; i < nItems; i++) {
+        cout << "\nDo you want to add a Book [1] or a DVD [2]? ";
+        cin >> response;
+
+        switch(response) {
+            case 1:
+                cin.ignore();
+                lib.add_book();
+                break;
+
+            case 2:
+                cin.ignore();
+                lib.add_dvd();
+                break;
+        }
+    }
+    system("CLS");
+
+    lib.printItems();
+
+    int maxItems = 5; // 10 for Professor
+    // Professor u1("Massimo", "Bossetti", maxItems);
+    Student u1("Andrea", "Quatrosi", maxItems);
     
-    Student s1("Andrea", "Quatrosi");
+    // borrowItem() Operation
+    cout << "\nHow many items do you want to borrow? [Insert number of items] ";
+    cin >> nItems;
 
-    lib.borrowItem(&s1, &b1);
-    lib.borrowItem(&s1, &b2);
-    lib.borrowItem(&s1, &b3);
-    lib.borrowItem(&s1, &d1);
-    lib.borrowItem(&s1, &d3);
-    lib.borrowItem(&s1, &d5);
+    size_t i = 0;
+    while(i < nItems) {
+        lib.borrowItem(&u1);
+        i++;
+    }
 
-    Professor p1("Massimo", "Bossetti");
-    
-    lib.borrowItem(&p1, &d1);
-    lib.borrowItem(&p1, &d2);
-    lib.borrowItem(&p1, &b4);
+    cout << "\nLibrary items: ";
+        lib.printItems();
 
-    cout << "\nStudent items:\n";
-    s1.printItems();
+    // returnItem() Operation
+    cout << "\nDo you want to return an item? [1 = Yes, 0 = No] ";
+    cin >> response;
 
-    cout << "\nProfessor items:\n";
-    p1.printItems();
+    if(response == 1) {
+        cout << "\nHow many items do you want to return? [Insert number of items] ";
+        cin >> nItems;
 
-    lib.returnItem(&s1, &d1);
+        i = 0;
+        while(i < nItems) {
+            lib.returnItem(&u1);
+            i++;
+        }
 
-    lib.borrowItem(&p1, &d1);
+        system("CLS");
+        cout << "\nUpdated borrowed items: ";
+        u1.printItems();
 
-    cout << "\nStudent items:\n";
-    s1.printItems();
+        cout << "\nLibrary items: ";
+        lib.printItems();
+    }
 
-    cout << "\nProfessor items:\n";
-    p1.printItems();
+    else {
+        system("CLS");
+        cout << "\nUpdated borrowed items: ";
+        u1.printItems();
+
+        cout << "\nGoodbye.\n";   
+    }
 
     return 0;
 }
