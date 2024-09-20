@@ -4,7 +4,7 @@
 using namespace std;
 
 // ITEM
-class Item {
+class Item {    // this is the Node of the Queue
     protected:
         string title;
         double publicationDate;
@@ -12,10 +12,12 @@ class Item {
 
         bool isAvaible;
 
-    public:
-        Item() : title(""), publicationDate(0.0f), id(0), isAvaible(true) {}
+        Item* next; // Adding next pointer
 
-        Item(const string& title, const double& publicationDate, const int& id) : title(title), publicationDate(publicationDate), id(id), isAvaible(true) {}
+    public:
+        Item() : title(""), publicationDate(0.0f), id(0), isAvaible(true), next(nullptr) {}
+
+        Item(const string& title, const double& publicationDate, const int& id) : title(title), publicationDate(publicationDate), id(id), isAvaible(true), next(nullptr) {}
 
         virtual void display() const {
             cout << "\ntitle: " << title << " - publication date: " << publicationDate << " - ID: " << id << "\n"; 
@@ -24,9 +26,11 @@ class Item {
         // Getter
         bool get_isAvaible() const { return isAvaible; }
         int get_id() const { return id; }
+        Item* get_next() { return next; }
 
         // Setter
         void set_isAvaible(bool isAvaible) { this->isAvaible = isAvaible; }
+        void set_next(Item* next) { this->next = next; }
 };
 
 class Book : public Item {
@@ -59,31 +63,110 @@ class DVD : public Item {
         }
 };
 
+// QUEUE
+class Queue {
+    private:
+        Item* head;
+        Item* tail;
+
+    public:
+        Queue() : head(nullptr), tail(nullptr) {}
+
+        // Operations
+        bool is_empty() const { return head == nullptr; }
+
+        void enqueue(Item* newItem) {
+
+            if(this->is_empty()) {
+                head = tail = newItem;
+
+                return;
+            }
+
+            tail->set_next(newItem);
+            tail = newItem;
+        }
+
+        void dequeue_element(int id) {
+            
+            if (this->is_empty()) {
+                cout << "\nQueue is empty.\n";
+                return;
+            }
+
+            Item* temp = head;
+            Item* prev = nullptr;
+
+            if (id == head->get_id()) {
+                temp = head;
+                head = head->get_next();
+
+                if(head == nullptr)
+                    tail = nullptr;
+            }
+            
+            else {
+                while (temp != nullptr && temp->get_id() != id) {
+                    prev = temp;
+                    temp = temp->get_next();
+                }
+
+                if (temp == nullptr) {
+                    cout << "\nItem not found.\n";
+                    return;
+                }
+
+                if (temp == tail) {
+                    tail = prev;
+                }
+
+                prev->set_next(temp->get_next());
+            }
+
+            temp->set_isAvaible(true);
+            temp->set_next(nullptr);    // not deleting because i'm returning the object to the Library
+        }
+
+
+        void display() const {
+            
+            Item* current = head;
+
+            while(current != nullptr) {
+                current->display();
+                current = current->get_next();
+            }
+        }
+};
+
 // PERSON
 class Person {
     protected:
         string name;
         string surname;
 
-        Item** borrowedItems; // try to do this as a queue of borrowed items
+        Queue borrowedItems;
+
+        // Item** borrowedItems; // try to do this as a queue of borrowed items
         size_t currentItems;
         int maxItems;
 
     public:
-        Person() : name(""), surname(""), borrowedItems(nullptr), currentItems(0), maxItems(0) {}
+        Person() : name(""), surname(""), /*borrowedItems(nullptr), currentItems(0),*/ maxItems(0) {}
 
         Person(const string& name, const string& surname, int maxItems) : name(name), surname(surname), currentItems(0), maxItems(maxItems) {
-            borrowedItems = new Item* [maxItems];
+            /*borrowedItems = new Item* [maxItems];
             for(size_t i = 0; i < maxItems; i++)
-                borrowedItems[i] = nullptr;
+                borrowedItems[i] = nullptr;*/
         }
 
         // Methods
         void borrowItem(Item* item) {
 
-            if(currentItems < maxItems && item->get_isAvaible() && item) {
-                borrowedItems[currentItems++] = item;
+            if(currentItems < maxItems && item->get_isAvaible()) {
+                borrowedItems.enqueue(item);
                 item->set_isAvaible(false);
+                currentItems++;
 
                 cout << "\nBorrowed Item: ";
                 item->display(); 
@@ -101,7 +184,10 @@ class Person {
 
         void returnItems(int id) {
             
-            bool found = false;
+            borrowedItems.dequeue_element(id);
+            currentItems--;
+
+            /*bool found = false;
             size_t j;
             for(size_t i = 0; i < currentItems; i++) {
                 if(id == borrowedItems[i]->get_id()) {
@@ -125,14 +211,13 @@ class Person {
 
             else {
                 cout << "\nThe given ID doesn't exists in your borrowed items.\n";
-            }
+            }*/
         }
 
         virtual void printItems() const {
 
             cout << "\nCurrently borrowed items: ";
-            for(size_t i = 0; i < currentItems; i++)
-                borrowedItems[i]->display();
+            borrowedItems.display();
         }
 };
 
@@ -295,9 +380,12 @@ int main() {
         lib.borrowItem(&u1);
         i++;
     }
+    system("CLS");
 
     cout << "\nLibrary items: ";
         lib.printItems();
+
+    u1.printItems();
 
     // returnItem() Operation
     cout << "\nDo you want to return an item? [1 = Yes, 0 = No] ";
