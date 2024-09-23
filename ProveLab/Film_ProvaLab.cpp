@@ -39,18 +39,25 @@ class Node {
 
         // Getter
         float get_score() const { return score; }
+        string get_title() const { return title; }
+        int get_year() const { return year; }
 
         Node* get_next() { return next; }
 
         Node*& get_right() { return right; }
         Node*& get_left() { return left; }        
 
-        // Setter   
+        // Setter
+        void set_score(const float& score) { this->score = score; }
+        void set_title(const string& title) { this->title = title; }
+        void set_year(const int& year) { this->year = year; }
+
         void set_next(Node* next) { this->next = next; }
 
         void set_right(Node* right) { this->right = right; }
         void set_left(Node* left) { this->left = left; }
 
+        // Friend
         friend ostream& operator<<(ostream& os, const Node& node) {
             os << "\n" << node.title << ", " << node.year << ", " << node.score << "\n";
 
@@ -161,6 +168,66 @@ class BST {
             else if(key->get_score() > root->get_score())
                 add_node(root->get_right(), key);
         }
+        
+        void delete_node(Node*& root, const float& key) {
+            
+            if(!root)
+                return;
+
+            if(key < root->get_score())
+                delete_node(root->get_left(), key);
+            
+            else if(key > root->get_score())
+                delete_node(root->get_right(), key);
+
+            else {
+                Node* toDelete = nullptr;
+
+                if(!root->get_left() && !root->get_right()) {
+                    delete root;
+                    root = nullptr;
+                }
+
+                else if(!root->get_left()) {
+                    toDelete = root;
+                    root = root->get_right();
+
+                    delete toDelete;
+                }
+
+                else if(!root->get_right()) {
+                    toDelete = root;
+                    root = root->get_left();
+
+                    delete toDelete;
+                }
+
+                else {
+                    Node* smallestRight = get_minNode(root->get_right());
+
+                    // Copy the entire data (title, year, and score)
+                    root->set_title(smallestRight->get_title());
+                    root->set_year(smallestRight->get_year());
+                    root->set_score(smallestRight->get_score());
+
+                    // Recursively delete the smallest node from the right subtree
+                    delete_node(root->get_right(), smallestRight->get_score());
+                }
+            }
+        }
+
+        Node* get_minNode(Node* root) {
+
+            if(!root)
+                return nullptr;
+
+            Node* current = root;
+
+            while(current->get_left())
+                current = current->get_left();
+
+            return current;
+        }
 
         void inOrder(Node* root) const {
 
@@ -174,9 +241,13 @@ class BST {
 
     public:
         BST() : root(nullptr) {}
-        
+
         void add_node(Node*& key) {
             add_node(root, key);
+        }
+
+        void delete_node(const float& key) {
+            delete_node(root, key);
         }
 
         void inOrder() const {
@@ -201,6 +272,11 @@ int main() {
     }
 
     cout << "\nBST:\n";
+    bst.inOrder();
+
+    bst.delete_node(7.9);
+
+    cout << "\nBST after deleting the node:\n";
     bst.inOrder();
 
     return 0;
