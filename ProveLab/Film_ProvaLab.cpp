@@ -66,13 +66,6 @@ class List {
     public:
         List() : head(nullptr), size(0) {}
 
-        ~List() {
-            while(!is_empty()) {
-                Node* toDelete = extract_head();
-                delete toDelete;
-            }
-        }
-
         // Getter
         size_t get_size() const { return size; }
 
